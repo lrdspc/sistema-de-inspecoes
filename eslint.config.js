@@ -12,17 +12,20 @@ export default [
     languageOptions: {
       parser: tseslint.parser,
       parserOptions: {
-        project: './tsconfig.json',
+        project: ['./tsconfig.app.json', './tsconfig.node.json'],
       },
     },
     plugins: {
       '@typescript-eslint': tseslint.plugin,
-      'prettier': eslintPluginPrettier,
+      prettier: eslintPluginPrettier,
     },
     rules: {
       'prettier/prettier': 'error',
       '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_' },
+      ],
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-empty-function': 'warn',
       '@typescript-eslint/no-empty-interface': 'warn',
