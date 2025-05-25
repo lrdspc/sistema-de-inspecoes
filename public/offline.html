@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - Sistema de Inspeções</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 500px;
+        }
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        h1 {
+            margin-bottom: 1rem;
+        }
+        p {
+            margin-bottom: 2rem;
+            color: #666;
+        }
+        .button {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background-color: #0070f3;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+        }
+        .button:hover {
+            background-color: #0051cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📡</div>
+        <h1>Você está offline</h1>
+        <p>Não foi possível conectar à internet. Verifique sua conexão e tente novamente.</p>
+        <p>Algumas funcionalidades ainda estão disponíveis no modo offline.</p>
+        <a href="/" class="button">Tentar novamente</a>
+    </div>
+</body>
+</html> 

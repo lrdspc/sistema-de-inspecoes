@@ -24,8 +24,8 @@ export function useSyncStatus() {
       try {
         const db = await getDB();
         const syncItems = await db.getAllFromIndex('sincronizacao', 'por_data');
-        
-        setStatus(prevStatus => ({
+
+        setStatus((prevStatus) => ({
           ...prevStatus,
           pendingSyncItems: syncItems.length,
           syncPercentage: syncItems.length > 0 ? 0 : 100, // Simplificado para o exemplo
@@ -36,11 +36,11 @@ export function useSyncStatus() {
     };
 
     const handleOnlineStatusChange = () => {
-      setStatus(prevStatus => ({
+      setStatus((prevStatus) => ({
         ...prevStatus,
-        isOnline: isOnline()
+        isOnline: isOnline(),
       }));
-      
+
       if (isOnline()) {
         checkSyncStatus();
       }
@@ -69,43 +69,46 @@ export function useSyncStatus() {
       return;
     }
 
-    setStatus(prev => ({ ...prev, isSyncing: true }));
+    setStatus((prev) => ({ ...prev, isSyncing: true }));
 
     try {
       // Simular progresso de sincronização
       let progress = 0;
       const totalItems = status.pendingSyncItems;
-      
+
       const progressInterval = setInterval(() => {
         progress += 10;
-        setStatus(prev => ({ 
-          ...prev, 
-          syncPercentage: Math.min(Math.round((progress / totalItems) * 100), 99)
+        setStatus((prev) => ({
+          ...prev,
+          syncPercentage: Math.min(
+            Math.round((progress / totalItems) * 100),
+            99
+          ),
         }));
-        
+
         if (progress >= totalItems) {
           clearInterval(progressInterval);
-          
+
           // Simular finalização
           setTimeout(() => {
-            setStatus(prev => ({ 
-              ...prev, 
+            setStatus((prev) => ({
+              ...prev,
               isSyncing: false,
               pendingSyncItems: 0,
               syncPercentage: 100,
-              lastSyncTime: Date.now()
+              lastSyncTime: Date.now(),
             }));
           }, 1000);
         }
       }, 500);
     } catch (error) {
       console.error('Erro durante sincronização:', error);
-      setStatus(prev => ({ ...prev, isSyncing: false }));
+      setStatus((prev) => ({ ...prev, isSyncing: false }));
     }
   };
 
   return {
     ...status,
-    triggerSync
+    triggerSync,
   };
 }

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { 
+import {
   Save,
   ArrowLeft,
   Building,
   Calendar,
   MapPin,
   Search,
-  Plus
+  Plus,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -34,15 +34,23 @@ export function NovaVistoriaPage() {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [clienteSelecionado, setClienteSelecionado] = useState<Cliente | null>(null);
+  const [clienteSelecionado, setClienteSelecionado] = useState<Cliente | null>(
+    null
+  );
   const [searchTerm, setSearchTerm] = useState('');
   const [showClientesList, setShowClientesList] = useState(false);
-  
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<VistoriaFormData>({
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<VistoriaFormData>({
     defaultValues: {
       data: format(new Date(), 'yyyy-MM-dd'),
-      hora: format(new Date(), 'HH:mm')
-    }
+      hora: format(new Date(), 'HH:mm'),
+    },
   });
 
   useEffect(() => {
@@ -51,12 +59,12 @@ export function NovaVistoriaPage() {
         const db = await getDB();
         const allClientes = await db.getAll('clientes');
         setClientes(allClientes);
-        
+
         // Se houver um cliente na query string, selecionar automaticamente
         const params = new URLSearchParams(location.search);
         const clienteId = params.get('cliente');
         if (clienteId) {
-          const cliente = allClientes.find(c => c.id === clienteId);
+          const cliente = allClientes.find((c) => c.id === clienteId);
           if (cliente) {
             setClienteSelecionado(cliente);
             setValue('clienteId', cliente.id);
@@ -70,10 +78,11 @@ export function NovaVistoriaPage() {
     fetchClientes();
   }, [location.search, setValue]);
 
-  const filteredClientes = clientes.filter(cliente =>
-    cliente.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    cliente.documento.includes(searchTerm) ||
-    cliente.cidade.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredClientes = clientes.filter(
+    (cliente) =>
+      cliente.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cliente.documento.includes(searchTerm) ||
+      cliente.cidade.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const onSubmit = async (data: VistoriaFormData) => {
@@ -84,7 +93,7 @@ export function NovaVistoriaPage() {
 
     try {
       setIsLoading(true);
-      
+
       // Criar objeto da vistoria
       const novaVistoria: Vistoria = {
         id: generateUniqueId(),
@@ -104,12 +113,12 @@ export function NovaVistoriaPage() {
         observacoes: data.observacoes,
         dataCriacao: Date.now(),
         dataModificacao: Date.now(),
-        sincronizado: false
+        sincronizado: false,
       };
-      
+
       const db = await getDB();
       await db.add('vistorias', novaVistoria);
-      
+
       // Adicionar à fila de sincronização
       await db.add('sincronizacao', {
         id: generateUniqueId(),
@@ -119,11 +128,13 @@ export function NovaVistoriaPage() {
         tentativas: 0,
         dataModificacao: Date.now(),
       });
-      
+
       navigate('/vistorias');
     } catch (error) {
       console.error('Erro ao salvar vistoria:', error);
-      alert('Ocorreu um erro ao salvar a vistoria. Por favor, tente novamente.');
+      alert(
+        'Ocorreu um erro ao salvar a vistoria. Por favor, tente novamente.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -133,7 +144,9 @@ export function NovaVistoriaPage() {
     const date = new Date();
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
-    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const random = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, '0');
     return `VST${year}${month}${random}`;
   };
 
@@ -145,10 +158,7 @@ export function NovaVistoriaPage() {
           <p className="text-gray-600">Agende uma nova vistoria técnica</p>
         </div>
         <div className="mt-4 sm:mt-0">
-          <Button 
-            variant="outline"
-            onClick={() => navigate('/vistorias')}
-          >
+          <Button variant="outline" onClick={() => navigate('/vistorias')}>
             <ArrowLeft size={18} className="mr-1" />
             Voltar
           </Button>
@@ -163,7 +173,7 @@ export function NovaVistoriaPage() {
               <Building size={18} className="inline mb-1 mr-2" />
               Cliente
             </h2>
-            
+
             <div className="relative">
               <Input
                 placeholder="Buscar cliente por nome, documento ou cidade..."
@@ -174,14 +184,16 @@ export function NovaVistoriaPage() {
                 }}
                 icon={<Search size={18} className="text-gray-400" />}
               />
-              
+
               {showClientesList && (
                 <div className="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200">
                   <div className="max-h-60 overflow-y-auto">
                     {filteredClientes.length === 0 ? (
                       <div className="p-4 text-center">
-                        <p className="text-gray-500">Nenhum cliente encontrado</p>
-                        <Button 
+                        <p className="text-gray-500">
+                          Nenhum cliente encontrado
+                        </p>
+                        <Button
                           onClick={() => navigate('/clientes/novo')}
                           size="sm"
                           className="mt-2"
@@ -191,7 +203,7 @@ export function NovaVistoriaPage() {
                         </Button>
                       </div>
                     ) : (
-                      filteredClientes.map(cliente => (
+                      filteredClientes.map((cliente) => (
                         <div
                           key={cliente.id}
                           className="p-3 hover:bg-gray-50 cursor-pointer"
@@ -202,7 +214,9 @@ export function NovaVistoriaPage() {
                             setSearchTerm('');
                           }}
                         >
-                          <div className="font-medium text-gray-900">{cliente.nome}</div>
+                          <div className="font-medium text-gray-900">
+                            {cliente.nome}
+                          </div>
                           <div className="text-sm text-gray-500 flex items-center">
                             <MapPin size={14} className="mr-1" />
                             {cliente.cidade}/{cliente.estado}
@@ -214,13 +228,17 @@ export function NovaVistoriaPage() {
                 </div>
               )}
             </div>
-            
+
             {clienteSelecionado && (
               <div className="mt-4 p-4 bg-blue-50 rounded-lg">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="text-sm font-medium text-blue-600">Cliente Selecionado</p>
-                    <p className="text-lg font-medium text-gray-900">{clienteSelecionado.nome}</p>
+                    <p className="text-sm font-medium text-blue-600">
+                      Cliente Selecionado
+                    </p>
+                    <p className="text-lg font-medium text-gray-900">
+                      {clienteSelecionado.nome}
+                    </p>
                   </div>
                   <button
                     type="button"
@@ -237,10 +255,12 @@ export function NovaVistoriaPage() {
                   <p className="text-sm font-medium text-blue-600">Endereço</p>
                   <p className="text-base text-gray-900">
                     {clienteSelecionado.logradouro}, {clienteSelecionado.numero}
-                    {clienteSelecionado.complemento && `, ${clienteSelecionado.complemento}`}
+                    {clienteSelecionado.complemento &&
+                      `, ${clienteSelecionado.complemento}`}
                   </p>
                   <p className="text-base text-gray-900">
-                    {clienteSelecionado.bairro}, {clienteSelecionado.cidade}/{clienteSelecionado.estado}
+                    {clienteSelecionado.bairro}, {clienteSelecionado.cidade}/
+                    {clienteSelecionado.estado}
                   </p>
                 </div>
               </div>
@@ -253,7 +273,7 @@ export function NovaVistoriaPage() {
               <Calendar size={18} className="inline mb-1 mr-2" />
               Data e Hora
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Input
@@ -276,8 +296,10 @@ export function NovaVistoriaPage() {
 
           {/* Detalhes da Vistoria */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Detalhes da Vistoria</h2>
-            
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Detalhes da Vistoria
+            </h2>
+
             <div className="space-y-4">
               <Input
                 label="Assunto *"
@@ -285,7 +307,7 @@ export function NovaVistoriaPage() {
                 error={errors.assunto?.message}
                 placeholder="Ex: Inspeção de rotina, Verificação de infiltração, etc."
               />
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Input
                   label="Modelo de Telha"
@@ -303,14 +325,14 @@ export function NovaVistoriaPage() {
                   placeholder="Ex: CRFS, Cerâmica, etc."
                 />
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   label="Quantidade de Telhas"
                   type="number"
                   {...register('quantidadeTelhas', {
                     valueAsNumber: true,
-                    min: { value: 0, message: 'Quantidade inválida' }
+                    min: { value: 0, message: 'Quantidade inválida' },
                   })}
                   error={errors.quantidadeTelhas?.message}
                 />
@@ -319,12 +341,12 @@ export function NovaVistoriaPage() {
                   type="number"
                   {...register('areaCoberta', {
                     valueAsNumber: true,
-                    min: { value: 0, message: 'Área inválida' }
+                    min: { value: 0, message: 'Área inválida' },
                   })}
                   error={errors.areaCoberta?.message}
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Observações
@@ -348,10 +370,7 @@ export function NovaVistoriaPage() {
             >
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              isLoading={isLoading}
-            >
+            <Button type="submit" isLoading={isLoading}>
               <Save size={18} className="mr-2" />
               Agendar Vistoria
             </Button>

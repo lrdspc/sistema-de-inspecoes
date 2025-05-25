@@ -13,13 +13,28 @@ export function Header({ toggleSidebar, isSidebarOpen }: HeaderProps) {
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = React.useState(false);
   const [notifications, setNotifications] = React.useState<any[]>([
-    { id: 1, title: 'Relatório pendente', description: 'Cliente XYZ - Há 2 dias', unread: true },
-    { id: 2, title: 'Nova vistoria agendada', description: 'Amanhã - 14:00', unread: true },
-    { id: 3, title: 'Lembrete de vistoria', description: 'Hoje - 16:30', unread: false },
+    {
+      id: 1,
+      title: 'Relatório pendente',
+      description: 'Cliente XYZ - Há 2 dias',
+      unread: true,
+    },
+    {
+      id: 2,
+      title: 'Nova vistoria agendada',
+      description: 'Amanhã - 14:00',
+      unread: true,
+    },
+    {
+      id: 3,
+      title: 'Lembrete de vistoria',
+      description: 'Hoje - 16:30',
+      unread: false,
+    },
   ]);
   const [showNotifications, setShowNotifications] = React.useState(false);
 
-  const unreadCount = notifications.filter(n => n.unread).length;
+  const unreadCount = notifications.filter((n) => n.unread).length;
 
   return (
     <header className="bg-white border-b border-gray-200">
@@ -33,8 +48,12 @@ export function Header({ toggleSidebar, isSidebarOpen }: HeaderProps) {
             {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
           <div className="flex items-center">
-            <span className="text-lg md:text-xl font-semibold text-blue-800">Sistema</span>
-            <span className="text-lg md:text-xl font-light text-gray-600 ml-1">Inspeções</span>
+            <span className="text-lg md:text-xl font-semibold text-blue-800">
+              Sistema
+            </span>
+            <span className="text-lg md:text-xl font-light text-gray-600 ml-1">
+              Inspeções
+            </span>
           </div>
         </div>
 
@@ -66,17 +85,25 @@ export function Header({ toggleSidebar, isSidebarOpen }: HeaderProps) {
                       <div
                         key={notification.id}
                         className={cn(
-                          "px-4 py-3 hover:bg-gray-50 cursor-pointer",
-                          notification.unread ? "bg-blue-50" : ""
+                          'px-4 py-3 hover:bg-gray-50 cursor-pointer',
+                          notification.unread ? 'bg-blue-50' : ''
                         )}
                         onClick={() => {
-                          setNotifications(prev => 
-                            prev.map(n => n.id === notification.id ? { ...n, unread: false } : n)
+                          setNotifications((prev) =>
+                            prev.map((n) =>
+                              n.id === notification.id
+                                ? { ...n, unread: false }
+                                : n
+                            )
                           );
                         }}
                       >
-                        <p className="text-sm font-medium text-gray-900">{notification.title}</p>
-                        <p className="text-xs text-gray-500">{notification.description}</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {notification.title}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {notification.description}
+                        </p>
                       </div>
                     ))
                   ) : (
@@ -97,14 +124,16 @@ export function Header({ toggleSidebar, isSidebarOpen }: HeaderProps) {
           {/* Perfil do usuário */}
           <div className="relative">
             <button
-              onClick={() => setShowUserMenu(prev => !prev)}
+              onClick={() => setShowUserMenu((prev) => !prev)}
               className="flex items-center space-x-2 focus:outline-none"
             >
-              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm"> 
+              <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-sm">
                 <span>TD</span>
               </div>
               <div className="hidden md:block text-left">
-                <p className="text-sm font-medium text-gray-700">Técnico Demo</p>
+                <p className="text-sm font-medium text-gray-700">
+                  Técnico Demo
+                </p>
                 <p className="text-xs text-gray-500">Técnico</p>
               </div>
             </button>
@@ -113,7 +142,9 @@ export function Header({ toggleSidebar, isSidebarOpen }: HeaderProps) {
             {showUserMenu && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200">
                 <div className="px-4 py-2 border-b border-gray-200">
-                  <p className="text-sm font-medium text-gray-900">Técnico Demo</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    Técnico Demo
+                  </p>
                   <p className="text-xs text-gray-500">tecnico@exemplo.com</p>
                 </div>
                 <div className="py-1">

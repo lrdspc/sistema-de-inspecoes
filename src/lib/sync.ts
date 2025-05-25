@@ -4,7 +4,9 @@ import { getDB } from './db';
 export const isOnline = () => navigator.onLine;
 
 // Monitora mudanças na conexão
-export const setupConnectionMonitoring = (onStatusChange: (online: boolean) => void) => {
+export const setupConnectionMonitoring = (
+  onStatusChange: (online: boolean) => void
+) => {
   window.addEventListener('online', () => onStatusChange(true));
   window.addEventListener('offline', () => onStatusChange(false));
   return () => {
@@ -19,7 +21,7 @@ const SYNC_CONFIG = {
   maxRetries: 3,
   batchSize: 10,
   maxConcurrent: 3,
-  persistKey: 'sync_state'
+  persistKey: 'sync_state',
 };
 
 let syncTimeout: NodeJS.Timeout | null = null;
@@ -30,7 +32,7 @@ function saveSyncState(): void {
   try {
     const state = {
       lastSync: Date.now(),
-      pending: isSyncing
+      pending: isSyncing,
     };
     localStorage.setItem(SYNC_CONFIG.persistKey, JSON.stringify(state));
   } catch (error) {
@@ -45,7 +47,7 @@ export const processSyncQueue = async (force: boolean = false) => {
   isSyncing = true;
   saveSyncState();
   let hasErrors = false;
-  
+
   const db = await getDB();
   const syncItems = await db.getAllFromIndex('sincronizacao', 'por_data');
 
@@ -53,10 +55,10 @@ export const processSyncQueue = async (force: boolean = false) => {
   for (let i = 0; i < syncItems.length; i += SYNC_CONFIG.batchSize) {
     const batch = syncItems.slice(i, i + SYNC_CONFIG.batchSize);
     const promises = batch.map(processItem);
-    
+
     try {
       // Processar lote com concorrência limitada
-      await Promise.all(promises.map(p => p.catch(e => e)));
+      await Promise.all(promises.map((p) => p.catch((e) => e)));
     } catch (error) {
       console.error('Erro ao processar lote:', error);
       hasErrors = true;
@@ -65,7 +67,7 @@ export const processSyncQueue = async (force: boolean = false) => {
 
   // Agendar próxima sincronização
   if (syncTimeout) clearTimeout(syncTimeout);
-  
+
   syncTimeout = setTimeout(
     processSyncQueue,
     hasErrors ? SYNC_CONFIG.retryDelay : SYNC_CONFIG.interval
@@ -86,8 +88,8 @@ async function processItem(item: SincronizacaoItem) {
 
   try {
     // Simular sincronização com backend
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
     // Simular sucesso da sincronização
     await db.delete('sincronizacao', item.id);
 
@@ -98,21 +100,21 @@ async function processItem(item: SincronizacaoItem) {
         await db.put(item.tabela, {
           ...originalItem,
           sincronizado: true,
-          dataModificacao: Date.now()
+          dataModificacao: Date.now(),
         });
       }
     }
   } catch (error) {
     console.error(`Erro ao sincronizar item ${item.id}:`, error);
-    
+
     // Atualizar contagem de tentativas
     await db.put('sincronizacao', {
       ...item,
       tentativas: (item.tentativas || 0) + 1,
       erro: error.message,
-      dataModificacao: Date.now()
+      dataModificacao: Date.now(),
     });
-    
+
     throw error;
   }
 }

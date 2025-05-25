@@ -9,7 +9,12 @@ interface SkeletonProps {
   className?: string;
 }
 
-export function SkeletonLoader({ count = 1, height, width, className }: SkeletonProps) {
+export function SkeletonLoader({
+  count = 1,
+  height,
+  width,
+  className,
+}: SkeletonProps) {
   return (
     <Skeleton
       count={count}

@@ -2,80 +2,111 @@ const IMAGE_CONFIG = {
   maxWidth: 1920,
   maxHeight: 1080,
   quality: 0.8,
-  formats: ['webp', 'jpeg'] as const
+  formats: ['webp', 'jpeg'] as const,
 };
 
-interface OptimizeOptions {
+interface OptimizeImageOptions {
   maxWidth?: number;
   maxHeight?: number;
   quality?: number;
-  format?: typeof IMAGE_CONFIG.formats[number];
+  format?: 'image/jpeg' | 'image/png' | 'image/webp';
 }
 
-export async function optimizeImage(file: File): Promise<File> {
-  if (!file.type.startsWith('image/')) {
-    return file;
-  }
-
-  const options: OptimizeOptions = {
-    maxWidth: IMAGE_CONFIG.maxWidth,
-    maxHeight: IMAGE_CONFIG.maxHeight,
-    quality: IMAGE_CONFIG.quality,
-    format: 'webp'
-  };
+export const optimizeImage = async (
+  file: File | Blob,
+  options: OptimizeImageOptions = {}
+): Promise<Blob> => {
+  const {
+    maxWidth = 1920,
+    maxHeight = 1080,
+    quality = 0.8,
+    format = 'image/jpeg',
+  } = options;
 
   return new Promise((resolve, reject) => {
     const img = new Image();
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    const url = URL.createObjectURL(file);
 
     img.onload = () => {
+      URL.revokeObjectURL(url);
+
       let width = img.width;
       let height = img.height;
 
-      if (width > options.maxWidth!) {
-        height = (options.maxWidth! * height) / width;
-        width = options.maxWidth!;
+      // Calcular dimensões mantendo proporção
+      if (width > maxWidth) {
+        height = Math.round((height * maxWidth) / width);
+        width = maxWidth;
+      }
+      if (height > maxHeight) {
+        width = Math.round((width * maxHeight) / height);
+        height = maxHeight;
       }
 
-      if (height > options.maxHeight!) {
-        width = (options.maxHeight! * width) / height;
-        height = options.maxHeight!;
-      }
-
+      // Criar canvas para redimensionamento
+      const canvas = document.createElement('canvas');
       canvas.width = width;
       canvas.height = height;
 
-      ctx?.drawImage(img, 0, 0, width, height);
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        reject(new Error('Não foi possível criar contexto 2D'));
+        return;
+      }
 
+      // Desenhar imagem redimensionada
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Converter para blob
       canvas.toBlob(
         (blob) => {
           if (!blob) {
-            reject(new Error('Failed to create blob'));
+            reject(new Error('Falha ao otimizar imagem'));
             return;
           }
-          resolve(new File([blob], file.name, { 
-            type: `image/${options.format}` 
-          }));
+          resolve(blob);
         },
-        `image/${options.format}`,
-        options.quality
+        format,
+        quality
       );
     };
 
-    img.onerror = () => reject(new Error('Failed to load image'));
-    img.src = URL.createObjectURL(file);
-  });
-}
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('Falha ao carregar imagem'));
+    };
 
-export async function generateThumbnail(file: File, size: number = 200): Promise<string> {
-  const options: OptimizeOptions = {
+    img.src = url;
+  });
+};
+
+export const compressImage = async (
+  file: File,
+  maxSizeKB: number = 1024
+): Promise<Blob> => {
+  let quality = 0.8;
+  let result = await optimizeImage(file, { quality });
+
+  // Reduzir qualidade até atingir tamanho desejado
+  while (result.size > maxSizeKB * 1024 && quality > 0.1) {
+    quality -= 0.1;
+    result = await optimizeImage(file, { quality });
+  }
+
+  return result;
+};
+
+export async function generateThumbnail(
+  file: File,
+  size: number = 200
+): Promise<string> {
+  const options: OptimizeImageOptions = {
     maxWidth: size,
     maxHeight: size,
     quality: 0.7,
-    format: 'webp'
+    format: 'image/webp',
   };
 
-  const optimized = await optimizeImage(file);
+  const optimized = await optimizeImage(file, options);
   return URL.createObjectURL(optimized);
 }

@@ -1,8 +1,8 @@
 import React from 'react';
 import { PageTransition } from '../../components/layout/PageTransition';
 import { Button } from '../../components/ui/Button';
-import { 
-  Settings, 
+import {
+  Settings,
   Moon,
   Sun,
   Bell,
@@ -10,7 +10,7 @@ import {
   HardDrive,
   RefreshCw,
   Trash2,
-  Shield
+  Shield,
 } from 'lucide-react';
 
 export function ConfiguracoesPage() {
@@ -24,7 +24,7 @@ export function ConfiguracoesPage() {
     if ('caches' in window) {
       try {
         const cacheNames = await caches.keys();
-        await Promise.all(cacheNames.map(name => caches.delete(name)));
+        await Promise.all(cacheNames.map((name) => caches.delete(name)));
         setCacheSize('0 MB');
       } catch (error) {
         console.error('Erro ao limpar cache:', error);
@@ -46,12 +46,14 @@ export function ConfiguracoesPage() {
             <Settings size={18} className="mr-2" />
             Aparência
           </h2>
-          
+
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-gray-700">Tema</p>
-                <p className="text-sm text-gray-500">Escolha entre tema claro ou escuro</p>
+                <p className="text-sm text-gray-500">
+                  Escolha entre tema claro ou escuro
+                </p>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -77,12 +79,14 @@ export function ConfiguracoesPage() {
             <Bell size={18} className="mr-2" />
             Notificações
           </h2>
-          
+
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-gray-700">Notificações Push</p>
-                <p className="text-sm text-gray-500">Receba alertas sobre novas vistorias e atualizações</p>
+                <p className="text-sm text-gray-500">
+                  Receba alertas sobre novas vistorias e atualizações
+                </p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -103,7 +107,7 @@ export function ConfiguracoesPage() {
             <Database size={18} className="mr-2" />
             Armazenamento
           </h2>
-          
+
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -111,14 +115,19 @@ export function ConfiguracoesPage() {
                 <span className="text-sm text-gray-500">{cacheSize}</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-blue-600 h-2 rounded-full" style={{ width: '45%' }}></div>
+                <div
+                  className="bg-blue-600 h-2 rounded-full"
+                  style={{ width: '45%' }}
+                ></div>
               </div>
             </div>
 
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-gray-700">Modo Offline</p>
-                <p className="text-sm text-gray-500">Permitir acesso offline aos dados</p>
+                <p className="text-sm text-gray-500">
+                  Permitir acesso offline aos dados
+                </p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -148,12 +157,16 @@ export function ConfiguracoesPage() {
             <RefreshCw size={18} className="mr-2" />
             Sincronização
           </h2>
-          
+
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-gray-700">Sincronização Automática</p>
-                <p className="text-sm text-gray-500">Sincronizar dados automaticamente quando online</p>
+                <p className="font-medium text-gray-700">
+                  Sincronização Automática
+                </p>
+                <p className="text-sm text-gray-500">
+                  Sincronizar dados automaticamente quando online
+                </p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -183,23 +196,23 @@ export function ConfiguracoesPage() {
             <Shield size={18} className="mr-2" />
             Segurança
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p className="font-medium text-gray-700">Última Sincronização</p>
               <p className="text-sm text-gray-500">Hoje às 10:32</p>
             </div>
-            
+
             <div>
               <p className="font-medium text-gray-700">Último Backup</p>
               <p className="text-sm text-gray-500">03/03/2024 às 15:45</p>
             </div>
-            
+
             <div>
               <p className="font-medium text-gray-700">Versão do App</p>
               <p className="text-sm text-gray-500">v0.1.0</p>
             </div>
-            
+
             <div>
               <p className="font-medium text-gray-700">Status do Sistema</p>
               <p className="text-sm text-green-500">Operacional</p>

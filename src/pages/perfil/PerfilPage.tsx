@@ -2,7 +2,7 @@ import React from 'react';
 import { PageTransition } from '../../components/layout/PageTransition';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { 
+import {
   User,
   Mail,
   Phone,
@@ -10,7 +10,7 @@ import {
   MapPin,
   Camera,
   Lock,
-  Save
+  Save,
 } from 'lucide-react';
 
 export function PerfilPage() {
@@ -47,7 +47,7 @@ export function PerfilPage() {
                   disabled={!isEditing}
                   icon={<User size={18} className="text-gray-400" />}
                 />
-                
+
                 <Input
                   label="E-mail"
                   type="email"
@@ -55,21 +55,21 @@ export function PerfilPage() {
                   disabled={!isEditing}
                   icon={<Mail size={18} className="text-gray-400" />}
                 />
-                
+
                 <Input
                   label="Telefone"
                   defaultValue="(11) 98765-4321"
                   disabled={!isEditing}
                   icon={<Phone size={18} className="text-gray-400" />}
                 />
-                
+
                 <Input
                   label="Cargo"
                   defaultValue="Técnico"
                   disabled={!isEditing}
                   icon={<Building size={18} className="text-gray-400" />}
                 />
-                
+
                 <Input
                   label="Unidade Regional"
                   defaultValue="São Paulo"
@@ -102,7 +102,7 @@ export function PerfilPage() {
                   type="password"
                   icon={<Lock size={18} className="text-gray-400" />}
                 />
-                
+
                 <Input
                   label="Nova Senha"
                   type="password"
@@ -111,9 +111,7 @@ export function PerfilPage() {
               </div>
 
               <div className="flex justify-end">
-                <Button type="submit">
-                  Alterar Senha
-                </Button>
+                <Button type="submit">Alterar Senha</Button>
               </div>
             </form>
           </div>
@@ -132,7 +130,9 @@ export function PerfilPage() {
                   <Camera size={18} />
                 </button>
               </div>
-              <h3 className="font-medium text-gray-900">Técnico Demonstração</h3>
+              <h3 className="font-medium text-gray-900">
+                Técnico Demonstração
+              </h3>
               <p className="text-sm text-gray-500">Técnico</p>
             </div>
 
@@ -144,18 +144,18 @@ export function PerfilPage() {
           {/* Estatísticas */}
           <div className="bg-white p-6 rounded-lg shadow-sm">
             <h3 className="font-medium text-gray-900 mb-4">Estatísticas</h3>
-            
+
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-gray-500">Vistorias Realizadas</p>
                 <p className="text-2xl font-semibold text-gray-900">127</p>
               </div>
-              
+
               <div>
                 <p className="text-sm text-gray-500">Relatórios Gerados</p>
                 <p className="text-2xl font-semibold text-gray-900">98</p>
               </div>
-              
+
               <div>
                 <p className="text-sm text-gray-500">Taxa de Conclusão</p>
                 <p className="text-2xl font-semibold text-green-600">94%</p>

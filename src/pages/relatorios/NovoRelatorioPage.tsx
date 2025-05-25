@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { 
+import {
   Save,
   ArrowLeft,
   FileText,
@@ -10,7 +10,7 @@ import {
   ClipboardCheck,
   AlertTriangle,
   CheckCircle,
-  XCircle
+  XCircle,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -33,19 +33,23 @@ export function NovoRelatorioPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [vistoria, setVistoria] = useState<Vistoria | null>(null);
   const [cliente, setCliente] = useState<Cliente | null>(null);
-  
+
   // Parse query parameters
   const params = new URLSearchParams(location.search);
   const vistoriaId = params.get('vistoria');
 
-  const { register, handleSubmit, formState: { errors } } = useForm<RelatorioFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RelatorioFormData>({
     defaultValues: {
       titulo: '',
       introducao: '',
       analiseTecnica: '',
       conclusao: '',
-      parecerFinal: 'procedente'
-    }
+      parecerFinal: 'procedente',
+    },
   });
 
   useEffect(() => {
@@ -55,12 +59,12 @@ export function NovoRelatorioPage() {
       try {
         setIsLoading(true);
         const db = await getDB();
-        
+
         // Buscar vistoria
         const vistoriaData = await db.get('vistorias', vistoriaId);
         if (vistoriaData) {
           setVistoria(vistoriaData);
-          
+
           // Buscar cliente
           const clienteData = await db.get('clientes', vistoriaData.clienteId);
           if (clienteData) {
@@ -82,7 +86,7 @@ export function NovoRelatorioPage() {
 
     try {
       setIsLoading(true);
-      
+
       const novoRelatorio: Relatorio = {
         id: generateUniqueId(),
         vistoriaId: vistoria.id,
@@ -94,24 +98,24 @@ export function NovoRelatorioPage() {
         dataFinalizacao: Date.now(),
         dataCriacao: Date.now(),
         dataModificacao: Date.now(),
-        sincronizado: false
+        sincronizado: false,
       };
-      
+
       const db = await getDB();
-      
+
       // Salvar relatório
       await db.add('relatorios', novoRelatorio);
-      
+
       // Atualizar vistoria com o ID do relatório
       const vistoriaAtualizada: Vistoria = {
         ...vistoria,
         relatorioId: novoRelatorio.id,
         dataModificacao: Date.now(),
-        sincronizado: false
+        sincronizado: false,
       };
-      
+
       await db.put('vistorias', vistoriaAtualizada);
-      
+
       // Adicionar à fila de sincronização
       await db.add('sincronizacao', {
         id: generateUniqueId(),
@@ -121,7 +125,7 @@ export function NovoRelatorioPage() {
         tentativas: 0,
         dataModificacao: Date.now(),
       });
-      
+
       await db.add('sincronizacao', {
         id: generateUniqueId(),
         tabela: 'vistorias',
@@ -130,12 +134,14 @@ export function NovoRelatorioPage() {
         tentativas: 0,
         dataModificacao: Date.now(),
       });
-      
+
       // Redirecionar para a lista de relatórios
       navigate('/relatorios');
     } catch (error) {
       console.error('Erro ao salvar relatório:', error);
-      alert('Ocorreu um erro ao salvar o relatório. Por favor, tente novamente.');
+      alert(
+        'Ocorreu um erro ao salvar o relatório. Por favor, tente novamente.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -144,8 +150,12 @@ export function NovoRelatorioPage() {
   if (!vistoria || !cliente) {
     return (
       <div className="p-6 bg-white rounded-lg shadow-sm text-center">
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">Vistoria não encontrada</h2>
-        <p className="text-gray-600 mb-4">Selecione uma vistoria para gerar o relatório.</p>
+        <h2 className="text-xl font-semibold text-gray-800 mb-2">
+          Vistoria não encontrada
+        </h2>
+        <p className="text-gray-600 mb-4">
+          Selecione uma vistoria para gerar o relatório.
+        </p>
         <Button onClick={() => navigate('/vistorias')}>
           <ArrowLeft size={18} className="mr-2" />
           Voltar para vistorias
@@ -162,10 +172,7 @@ export function NovoRelatorioPage() {
           <p className="text-gray-600">Gerar relatório técnico da vistoria</p>
         </div>
         <div className="mt-4 sm:mt-0">
-          <Button 
-            variant="outline"
-            onClick={() => navigate('/relatorios')}
-          >
+          <Button variant="outline" onClick={() => navigate('/relatorios')}>
             <ArrowLeft size={18} className="mr-1" />
             Voltar
           </Button>
@@ -178,7 +185,7 @@ export function NovoRelatorioPage() {
             <Building size={18} className="inline mb-1 mr-2" />
             Dados da Vistoria
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <p className="text-sm font-medium text-gray-500">Cliente</p>
@@ -189,9 +196,13 @@ export function NovoRelatorioPage() {
               <p className="text-base text-gray-900">{vistoria.protocolo}</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">Data da Vistoria</p>
+              <p className="text-sm font-medium text-gray-500">
+                Data da Vistoria
+              </p>
               <p className="text-base text-gray-900">
-                {format(new Date(vistoria.data), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}
+                {format(new Date(vistoria.data), "dd 'de' MMMM 'de' yyyy", {
+                  locale: ptBR,
+                })}
               </p>
             </div>
             <div>
@@ -210,7 +221,7 @@ export function NovoRelatorioPage() {
               placeholder="Ex: Relatório de Vistoria Técnica - Infiltração em Telhado"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Introdução *
@@ -219,13 +230,17 @@ export function NovoRelatorioPage() {
               className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               rows={4}
               placeholder="Descreva o objetivo da vistoria e contexto inicial..."
-              {...register('introducao', { required: 'Introdução é obrigatória' })}
+              {...register('introducao', {
+                required: 'Introdução é obrigatória',
+              })}
             ></textarea>
             {errors.introducao && (
-              <p className="mt-1 text-sm text-red-600">{errors.introducao.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.introducao.message}
+              </p>
             )}
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Análise Técnica *
@@ -234,13 +249,17 @@ export function NovoRelatorioPage() {
               className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               rows={8}
               placeholder="Detalhe a análise técnica realizada, incluindo observações e não conformidades encontradas..."
-              {...register('analiseTecnica', { required: 'Análise técnica é obrigatória' })}
+              {...register('analiseTecnica', {
+                required: 'Análise técnica é obrigatória',
+              })}
             ></textarea>
             {errors.analiseTecnica && (
-              <p className="mt-1 text-sm text-red-600">{errors.analiseTecnica.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.analiseTecnica.message}
+              </p>
             )}
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Conclusão *
@@ -249,13 +268,17 @@ export function NovoRelatorioPage() {
               className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
               rows={4}
               placeholder="Apresente a conclusão da análise e recomendações..."
-              {...register('conclusao', { required: 'Conclusão é obrigatória' })}
+              {...register('conclusao', {
+                required: 'Conclusão é obrigatória',
+              })}
             ></textarea>
             {errors.conclusao && (
-              <p className="mt-1 text-sm text-red-600">{errors.conclusao.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.conclusao.message}
+              </p>
             )}
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Parecer Final *
@@ -272,9 +295,12 @@ export function NovoRelatorioPage() {
                   <CheckCircle size={20} className="text-green-600 mr-2" />
                   <span className="text-sm font-medium">Procedente</span>
                 </div>
-                <div className="absolute -inset-px rounded-lg border-2 pointer-events-none peer-checked:border-blue-600" aria-hidden="true"></div>
+                <div
+                  className="absolute -inset-px rounded-lg border-2 pointer-events-none peer-checked:border-blue-600"
+                  aria-hidden="true"
+                ></div>
               </label>
-              
+
               <label className="relative flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
                 <input
                   type="radio"
@@ -286,9 +312,12 @@ export function NovoRelatorioPage() {
                   <XCircle size={20} className="text-red-600 mr-2" />
                   <span className="text-sm font-medium">Improcedente</span>
                 </div>
-                <div className="absolute -inset-px rounded-lg border-2 pointer-events-none peer-checked:border-blue-600" aria-hidden="true"></div>
+                <div
+                  className="absolute -inset-px rounded-lg border-2 pointer-events-none peer-checked:border-blue-600"
+                  aria-hidden="true"
+                ></div>
               </label>
-              
+
               <label className="relative flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
                 <input
                   type="radio"
@@ -298,13 +327,18 @@ export function NovoRelatorioPage() {
                 />
                 <div className="flex items-center">
                   <AlertTriangle size={20} className="text-yellow-600 mr-2" />
-                  <span className="text-sm font-medium">Parcialmente Procedente</span>
+                  <span className="text-sm font-medium">
+                    Parcialmente Procedente
+                  </span>
                 </div>
-                <div className="absolute -inset-px rounded-lg border-2 pointer-events-none peer-checked:border-blue-600" aria-hidden="true"></div>
+                <div
+                  className="absolute -inset-px rounded-lg border-2 pointer-events-none peer-checked:border-blue-600"
+                  aria-hidden="true"
+                ></div>
               </label>
             </div>
           </div>
-          
+
           <div className="flex justify-end gap-4">
             <Button
               type="button"
@@ -313,10 +347,7 @@ export function NovoRelatorioPage() {
             >
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              isLoading={isLoading}
-            >
+            <Button type="submit" isLoading={isLoading}>
               <Save size={18} className="mr-2" />
               Salvar Relatório
             </Button>

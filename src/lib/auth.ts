@@ -1,5 +1,5 @@
-import { create } from 'zustand'; 
-import { persist } from 'zustand/middleware'; 
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 // Mock user for demo purposes
 const DEMO_USER = {
@@ -9,8 +9,8 @@ const DEMO_USER = {
   cargo: 'Técnico',
   unidadeRegional: 'PR',
   fotoUrl: undefined,
-  mfaHabilitado: false
-}
+  mfaHabilitado: false,
+};
 
 interface AuthUser {
   id: string;
@@ -43,10 +43,10 @@ export const useAuth = create<AuthState>()(
           set({ isLoading: true, error: null });
           // Demo login - only allow demo user
           if (email === 'tecnico@exemplo.com' && password === '123456') {
-            set({ 
+            set({
               user: DEMO_USER,
               isLoading: false,
-              error: null
+              error: null,
             });
           } else {
             throw new Error('Credenciais inválidas');
@@ -70,7 +70,7 @@ export const useAuth = create<AuthState>()(
       checkAuth: async () => {
         try {
           set({ isLoading: true });
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 500));
           // For demo, check if we have a persisted user
           const user = localStorage.getItem('auth-storage');
           if (user) {
@@ -81,11 +81,11 @@ export const useAuth = create<AuthState>()(
         } catch (error) {
           set({ isLoading: false, error: error.message });
         }
-      }
+      },
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({ user: state.user })
+      partialize: (state) => ({ user: state.user }),
     }
   )
 );

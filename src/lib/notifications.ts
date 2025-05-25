@@ -3,12 +3,13 @@ const NOTIFICATION_TYPES = {
   SYNC_SUCCESS: 'sync_success',
   NEW_INSPECTION: 'new_inspection',
   INSPECTION_REMINDER: 'inspection_reminder',
-  REPORT_DUE: 'report_due'
+  REPORT_DUE: 'report_due',
 } as const;
 
-type NotificationType = typeof NOTIFICATION_TYPES[keyof typeof NOTIFICATION_TYPES];
+type NotificationType =
+  (typeof NOTIFICATION_TYPES)[keyof typeof NOTIFICATION_TYPES];
 
-interface NotificationOptions extends Omit<NotificationOptions, 'icon' | 'badge'> {
+interface CustomNotificationOptions extends NotificationOptions {
   type: NotificationType;
   data?: any;
 }
@@ -16,7 +17,7 @@ interface NotificationOptions extends Omit<NotificationOptions, 'icon' | 'badge'
 // Solicita permissão para notificações
 export const requestNotificationPermission = async () => {
   if (!('Notification' in window)) return false;
-  
+
   try {
     const permission = await Notification.requestPermission();
     return permission === 'granted';
@@ -27,39 +28,42 @@ export const requestNotificationPermission = async () => {
 };
 
 // Mostra uma notificação
-export const showNotification = (title: string, options: NotificationOptions) => {
-  if (!('Notification' in window) || Notification.permission !== 'granted') return;
-  
+export const showNotification = (
+  title: string,
+  options: CustomNotificationOptions
+) => {
+  if (!('Notification' in window) || Notification.permission !== 'granted')
+    return;
+
   try {
     new Notification(title, {
       icon: '/pwa-192x192.png',
       badge: '/pwa-192x192.png',
-      ...options
-      requireInteraction: options.type === NOTIFICATION_TYPES.INSPECTION_REMINDER,
-      actions: getNotificationActions(options.type)
+      ...options,
+      requireInteraction:
+        options.type === NOTIFICATION_TYPES.INSPECTION_REMINDER,
+      actions: getNotificationActions(options.type),
     });
   } catch (error) {
     console.error('Erro ao mostrar notificação:', error);
   }
 };
 
-function getNotificationActions(type: NotificationType) {
+function getNotificationActions(type: NotificationType): NotificationAction[] {
   switch (type) {
     case NOTIFICATION_TYPES.NEW_INSPECTION:
       return [
         { action: 'view', title: 'Ver Detalhes' },
-        { action: 'accept', title: 'Aceitar' }
+        { action: 'accept', title: 'Aceitar' },
       ];
     case NOTIFICATION_TYPES.INSPECTION_REMINDER:
       return [
         { action: 'view', title: 'Ver Vistoria' },
-        { action: 'snooze', title: 'Adiar 1h' }
+        { action: 'snooze', title: 'Adiar 1h' },
       ];
     case NOTIFICATION_TYPES.REPORT_DUE:
-      return [
-        { action: 'start', title: 'Iniciar Relatório' }
-      ];
+      return [{ action: 'start', title: 'Iniciar Relatório' }];
     default:
       return [];
   }
-};
+}

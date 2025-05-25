@@ -8,7 +8,12 @@ interface VirtualListProps<T> {
   className?: string;
 }
 
-export function VirtualList<T>({ items, rowHeight, renderRow, className }: VirtualListProps<T>) {
+export function VirtualList<T>({
+  items,
+  rowHeight,
+  renderRow,
+  className,
+}: VirtualListProps<T>) {
   const rowRenderer = ({ index, key, style }: ListRowProps) => {
     const item = items[index];
     return (

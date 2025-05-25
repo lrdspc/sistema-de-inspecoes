@@ -1,4 +1,10 @@
-import { Document, Paragraph, TextRun, AlignmentType, HeadingLevel } from 'docx';
+import {
+  Document,
+  Paragraph,
+  TextRun,
+  AlignmentType,
+  HeadingLevel,
+} from 'docx';
 
 // Convert millimeters to twips (1 mm = 56.7 twips)
 const MM_TO_TWIPS = 56.7;
@@ -7,7 +13,7 @@ const convertMillimetersToTwip = (mm: number) => Math.round(mm * MM_TO_TWIPS);
 // Page size constants (A4)
 const PAGE = {
   width: convertMillimetersToTwip(210),
-  height: convertMillimetersToTwip(297)
+  height: convertMillimetersToTwip(297),
 };
 
 // Document formatting constants
@@ -16,7 +22,7 @@ const FORMATTING = {
     top: convertMillimetersToTwip(25),
     right: convertMillimetersToTwip(25),
     bottom: convertMillimetersToTwip(25),
-    left: convertMillimetersToTwip(30)
+    left: convertMillimetersToTwip(30),
   },
   font: {
     name: 'Times New Roman',
@@ -25,22 +31,25 @@ const FORMATTING = {
       before: 0,
       after: 240, // 8pt
       line: 360, // 1.5 lines
-      lineRule: 'auto'
+      lineRule: 'auto',
     },
     paragraph: {
       spacing: {
         before: 240, // 8pt
         after: 240, // 8pt
         line: 360, // 1.5 lines
-        lineRule: 'auto'
-      }
-    }
-  }
+        lineRule: 'auto',
+      },
+    },
+  },
 };
 
 // Textos fixos do relatório
 const TEXTOS = {
-  introducao: (protocolo: string, modeloTelha: string) => `A Área de Assistência Técnica foi solicitada para atender uma reclamação relacionada ao surgimento de infiltrações nas telhas de fibrocimento: - Telha da marca BRASILIT modelo ONDULADA de 5mm, produzidas com tecnologia CRFS - Cimento Reforçado com Fios Sintéticos - 100% sem amianto - cuja fabricação segue a norma internacional ISO 9933, bem como as normas técnicas da ABNT: NBR-15210-1, NBR-15210-2 e NBR-15210-3.
+  introducao: (
+    protocolo: string,
+    modeloTelha: string
+  ) => `A Área de Assistência Técnica foi solicitada para atender uma reclamação relacionada ao surgimento de infiltrações nas telhas de fibrocimento: - Telha da marca BRASILIT modelo ONDULADA de 5mm, produzidas com tecnologia CRFS - Cimento Reforçado com Fios Sintéticos - 100% sem amianto - cuja fabricação segue a norma internacional ISO 9933, bem como as normas técnicas da ABNT: NBR-15210-1, NBR-15210-2 e NBR-15210-3.
 
 Em atenção a vossa solicitação, analisamos as evidências encontradas, para avaliar as manifestações patológicas reclamadas em telhas de nossa marca aplicada em sua cobertura conforme registro de reclamação protocolo FAR ${protocolo}.
 
@@ -62,23 +71,26 @@ Atenciosamente,
 
 Saint-Gobain do Brasil Prod. Ind. e para Cons. Civil Ltda.
 Divisão Produtos Para Construção
-Departamento de Assistência Técnica`
+Departamento de Assistência Técnica`,
 };
 
 // Banco de dados de não conformidades
 const NAO_CONFORMIDADES = {
-  "1": {
-    titulo: "Armazenagem Incorreta",
-    texto: "Durante a inspeção, foi constatado que as telhas estão sendo armazenadas de forma inadequada, em desacordo com as recomendações técnicas do fabricante. As telhas BRASILIT devem ser armazenadas em local plano, firme, coberto e seco, protegidas das intempéries. O empilhamento deve ser feito horizontalmente, com as telhas apoiadas sobre caibros ou pontaletes de madeira espaçados no máximo a cada 50cm, garantindo um apoio uniforme. A altura máxima da pilha não deve ultrapassar 200 telhas. É fundamental manter uma distância mínima de 1 metro entre as pilhas para facilitar a circulação. O não cumprimento destas diretrizes pode resultar em deformações, trincas ou quebras das telhas, comprometendo sua integridade e desempenho futuro."
+  '1': {
+    titulo: 'Armazenagem Incorreta',
+    texto:
+      'Durante a inspeção, foi constatado que as telhas estão sendo armazenadas de forma inadequada, em desacordo com as recomendações técnicas do fabricante. As telhas BRASILIT devem ser armazenadas em local plano, firme, coberto e seco, protegidas das intempéries. O empilhamento deve ser feito horizontalmente, com as telhas apoiadas sobre caibros ou pontaletes de madeira espaçados no máximo a cada 50cm, garantindo um apoio uniforme. A altura máxima da pilha não deve ultrapassar 200 telhas. É fundamental manter uma distância mínima de 1 metro entre as pilhas para facilitar a circulação. O não cumprimento destas diretrizes pode resultar em deformações, trincas ou quebras das telhas, comprometendo sua integridade e desempenho futuro.',
   },
-  "2": {
-    titulo: "Carga Permanente sobre as Telhas",
-    texto: "Foi identificada a presença de cargas permanentes sobre as telhas, como equipamentos, materiais ou estruturas apoiadas diretamente sobre a cobertura. Esta prática é inadequada e contraria as especificações técnicas do fabricante. As telhas BRASILIT não são projetadas para suportar cargas concentradas adicionais além do seu próprio peso e das cargas previstas em projeto (vento e eventual acúmulo de água da chuva). O excesso de carga pode causar deformações, trincas e comprometer a estanqueidade do telhado."
+  '2': {
+    titulo: 'Carga Permanente sobre as Telhas',
+    texto:
+      'Foi identificada a presença de cargas permanentes sobre as telhas, como equipamentos, materiais ou estruturas apoiadas diretamente sobre a cobertura. Esta prática é inadequada e contraria as especificações técnicas do fabricante. As telhas BRASILIT não são projetadas para suportar cargas concentradas adicionais além do seu próprio peso e das cargas previstas em projeto (vento e eventual acúmulo de água da chuva). O excesso de carga pode causar deformações, trincas e comprometer a estanqueidade do telhado.',
   },
-  "3": {
-    titulo: "Corte de Canto Incorreto ou Ausente",
-    texto: "Foi observado que os cortes de canto das telhas não foram executados corretamente ou estão ausentes em algumas peças. O corte de canto é fundamental para evitar a sobreposição de quatro telhas no mesmo ponto, o que pode causar infiltrações. O corte deve ser feito em ângulo de 45° com dimensões conforme especificado no catálogo técnico do produto."
-  }
+  '3': {
+    titulo: 'Corte de Canto Incorreto ou Ausente',
+    texto:
+      'Foi observado que os cortes de canto das telhas não foram executados corretamente ou estão ausentes em algumas peças. O corte de canto é fundamental para evitar a sobreposição de quatro telhas no mesmo ponto, o que pode causar infiltrações. O corte deve ser feito em ângulo de 45° com dimensões conforme especificado no catálogo técnico do produto.',
+  },
 };
 
 interface GenerateWordDocOptions {
@@ -110,231 +122,235 @@ export async function generateWordDoc(data: GenerateWordDocOptions) {
         document: {
           run: {
             font: FORMATTING.font.name,
-            size: FORMATTING.font.size
+            size: FORMATTING.font.size,
           },
           paragraph: {
             ...FORMATTING.font.paragraph,
-            alignment: AlignmentType.JUSTIFIED
-          }
-        }
-      }
-    },
-    sections: [{
-      properties: {
-        page: {
-          size: {
-            width: PAGE.width,
-            height: PAGE.height,
-            orientation: 'portrait'
+            alignment: AlignmentType.JUSTIFIED,
           },
-          margin: FORMATTING.margins
-        }
+        },
       },
-      children: [
-        // Título
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: "RELATÓRIO DE VISTORIA TÉCNICA",
-              bold: true,
-              size: 28 // 14pt
-            })
-          ],
-          alignment: AlignmentType.CENTER,
-          spacing: { before: 480, after: 480 } // 2 lines before and after
-        }),
-
-        // Informações básicas
-        new Paragraph({
-          children: [
-            new TextRun({ text: "Data de vistoria: ", bold: true }),
-            new TextRun(data.dataVistoria)
-          ]
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({ text: "Cliente: ", bold: true }),
-            new TextRun(data.cliente)
-          ]
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({ text: "Empreendimento: ", bold: true }),
-            new TextRun(data.empreendimento)
-          ]
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({ text: "Cidade: ", bold: true }),
-            new TextRun(`${data.cidade} - ${data.estado}`)
-          ]
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({ text: "Endereço: ", bold: true }),
-            new TextRun(data.endereco)
-          ]
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({ text: "FAR/Protocolo: ", bold: true }),
-            new TextRun(data.protocolo)
-          ]
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({ text: "Assunto: ", bold: true }),
-            new TextRun(data.assunto)
-          ]
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({ text: "Elaborado por: ", bold: true }),
-            new TextRun(data.tecnico)
-          ]
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({ text: "Departamento: ", bold: true }),
-            new TextRun(data.departamento)
-          ]
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({ text: "Unidade: ", bold: true }),
-            new TextRun(data.unidade)
-          ]
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({ text: "Coordenador Responsável: ", bold: true }),
-            new TextRun(data.coordenador)
-          ]
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({ text: "Gerente Responsável: ", bold: true }),
-            new TextRun(data.gerente)
-          ]
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({ text: "Regional: ", bold: true }),
-            new TextRun(data.regional)
-          ],
-          spacing: { after: 480 } // 2 lines
-        }),
-
-        // Quantidade e modelo
-        new Paragraph({
-          children: [
-            new TextRun({ text: "Quantidade e modelo:", bold: true })
-          ],
-          spacing: { before: 240, after: 240 }
-        }),
-        new Paragraph({
-          text: `• ${data.quantidadeTelhas} telhas ${data.modeloTelha}`,
-          spacing: { after: 240 }
-        }),
-        new Paragraph({
-          text: `• Área coberta: ${data.areaCoberta}m² aproximadamente`,
-          spacing: { after: 480 } // 2 lines
-        }),
-
-        // Introdução
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: "Introdução",
-              bold: true
-            })
-          ],
-          spacing: { before: 480, after: 240 }
-        }),
-        new Paragraph({
-          text: TEXTOS.introducao(data.protocolo, data.modeloTelha),
-          spacing: { after: 480 } // 2 lines
-        }),
-
-        // Análise Técnica
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: "Análise Técnica",
-              bold: true
-            })
-          ],
-          spacing: { before: 480, after: 240 }
-        }),
-        new Paragraph({
-          text: TEXTOS.analiseTecnica,
-          spacing: { after: 480 } // 2 lines
-        }),
-
-        // Não Conformidades
-        ...data.naoConformidades.map(ncId => {
-          const nc = NAO_CONFORMIDADES[ncId];
-          if (!nc) return [];
-
-          return [
-            new Paragraph({
-              children: [
-                new TextRun({
-                  text: nc.titulo,
-                  bold: true
-                })
-              ],
-              spacing: { before: 240, after: 240 }
-            }),
-            new Paragraph({
-              text: nc.texto,
-              spacing: { after: 480 } // 2 lines
-            })
-          ];
-        }).flat(),
-
-        // Conclusão
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: "Conclusão",
-              bold: true
-            })
-          ],
-          spacing: { before: 480, after: 240 }
-        }),
-        new Paragraph({
-          text: "Com base na análise técnica realizada, foram identificadas as seguintes não conformidades:",
-          spacing: { before: 240, after: 240 }
-        }),
-        ...data.naoConformidades.map((ncId, index) => {
-          const nc = NAO_CONFORMIDADES[ncId];
-          if (!nc) return [];
-
-          return new Paragraph({
-            text: `${index + 1}. ${nc.titulo}`,
-            spacing: { 
-              before: 120,
-              after: 240
-            }
-          });
-        }),
-        new Paragraph({
-          text: TEXTOS.conclusao,
-          spacing: { after: 480 } // 2 lines
-        }),
-
-        // Assinatura
-        new Paragraph({
-          text: TEXTOS.assinatura,
-          spacing: { 
-            before: 720, // 3 lines
-            after: 480 // 2 lines
+    },
+    sections: [
+      {
+        properties: {
+          page: {
+            size: {
+              width: PAGE.width,
+              height: PAGE.height,
+              orientation: 'portrait',
+            },
+            margin: FORMATTING.margins,
           },
-          alignment: AlignmentType.LEFT
-        })
-      ]
-    }]
+        },
+        children: [
+          // Título
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: 'RELATÓRIO DE VISTORIA TÉCNICA',
+                bold: true,
+                size: 28, // 14pt
+              }),
+            ],
+            alignment: AlignmentType.CENTER,
+            spacing: { before: 480, after: 480 }, // 2 lines before and after
+          }),
+
+          // Informações básicas
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Data de vistoria: ', bold: true }),
+              new TextRun(data.dataVistoria),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Cliente: ', bold: true }),
+              new TextRun(data.cliente),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Empreendimento: ', bold: true }),
+              new TextRun(data.empreendimento),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Cidade: ', bold: true }),
+              new TextRun(`${data.cidade} - ${data.estado}`),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Endereço: ', bold: true }),
+              new TextRun(data.endereco),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'FAR/Protocolo: ', bold: true }),
+              new TextRun(data.protocolo),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Assunto: ', bold: true }),
+              new TextRun(data.assunto),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Elaborado por: ', bold: true }),
+              new TextRun(data.tecnico),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Departamento: ', bold: true }),
+              new TextRun(data.departamento),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Unidade: ', bold: true }),
+              new TextRun(data.unidade),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Coordenador Responsável: ', bold: true }),
+              new TextRun(data.coordenador),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Gerente Responsável: ', bold: true }),
+              new TextRun(data.gerente),
+            ],
+          }),
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Regional: ', bold: true }),
+              new TextRun(data.regional),
+            ],
+            spacing: { after: 480 }, // 2 lines
+          }),
+
+          // Quantidade e modelo
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Quantidade e modelo:', bold: true }),
+            ],
+            spacing: { before: 240, after: 240 },
+          }),
+          new Paragraph({
+            text: `• ${data.quantidadeTelhas} telhas ${data.modeloTelha}`,
+            spacing: { after: 240 },
+          }),
+          new Paragraph({
+            text: `• Área coberta: ${data.areaCoberta}m² aproximadamente`,
+            spacing: { after: 480 }, // 2 lines
+          }),
+
+          // Introdução
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: 'Introdução',
+                bold: true,
+              }),
+            ],
+            spacing: { before: 480, after: 240 },
+          }),
+          new Paragraph({
+            text: TEXTOS.introducao(data.protocolo, data.modeloTelha),
+            spacing: { after: 480 }, // 2 lines
+          }),
+
+          // Análise Técnica
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: 'Análise Técnica',
+                bold: true,
+              }),
+            ],
+            spacing: { before: 480, after: 240 },
+          }),
+          new Paragraph({
+            text: TEXTOS.analiseTecnica,
+            spacing: { after: 480 }, // 2 lines
+          }),
+
+          // Não Conformidades
+          ...data.naoConformidades
+            .map((ncId) => {
+              const nc = NAO_CONFORMIDADES[ncId];
+              if (!nc) return [];
+
+              return [
+                new Paragraph({
+                  children: [
+                    new TextRun({
+                      text: nc.titulo,
+                      bold: true,
+                    }),
+                  ],
+                  spacing: { before: 240, after: 240 },
+                }),
+                new Paragraph({
+                  text: nc.texto,
+                  spacing: { after: 480 }, // 2 lines
+                }),
+              ];
+            })
+            .flat(),
+
+          // Conclusão
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: 'Conclusão',
+                bold: true,
+              }),
+            ],
+            spacing: { before: 480, after: 240 },
+          }),
+          new Paragraph({
+            text: 'Com base na análise técnica realizada, foram identificadas as seguintes não conformidades:',
+            spacing: { before: 240, after: 240 },
+          }),
+          ...data.naoConformidades.map((ncId, index) => {
+            const nc = NAO_CONFORMIDADES[ncId];
+            if (!nc) return [];
+
+            return new Paragraph({
+              text: `${index + 1}. ${nc.titulo}`,
+              spacing: {
+                before: 120,
+                after: 240,
+              },
+            });
+          }),
+          new Paragraph({
+            text: TEXTOS.conclusao,
+            spacing: { after: 480 }, // 2 lines
+          }),
+
+          // Assinatura
+          new Paragraph({
+            text: TEXTOS.assinatura,
+            spacing: {
+              before: 720, // 3 lines
+              after: 480, // 2 lines
+            },
+            alignment: AlignmentType.LEFT,
+          }),
+        ],
+      },
+    ],
   });
 
   return doc;

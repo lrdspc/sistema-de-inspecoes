@@ -32,8 +32,8 @@ class ErrorMonitor {
         context: {
           filename: event.filename,
           lineNo: event.lineno,
-          colNo: event.colno
-        }
+          colNo: event.colno,
+        },
       });
     });
 
@@ -41,7 +41,7 @@ class ErrorMonitor {
       this.captureError({
         message: event.reason?.message || 'Unhandled Promise Rejection',
         stack: event.reason?.stack,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
     });
   }

@@ -108,51 +108,51 @@ interface BrasilitDB extends DBSchema {
     key: string;
     value: Cliente;
     indexes: {
-      'por_nome': string;
-      'por_cidade': string;
-      'por_sincronizado': boolean;
+      por_nome: string;
+      por_cidade: string;
+      por_sincronizado: boolean;
     };
   };
   vistorias: {
     key: string;
     value: Vistoria;
     indexes: {
-      'por_cliente': string;
-      'por_data': number;
-      'por_status': string;
-      'por_tecnico': string;
-      'por_sincronizado': boolean;
+      por_cliente: string;
+      por_data: number;
+      por_status: string;
+      por_tecnico: string;
+      por_sincronizado: boolean;
     };
   };
   naoConformidades: {
     key: string;
     value: NaoConformidade;
     indexes: {
-      'por_vistoria': string;
-      'por_sincronizado': boolean;
+      por_vistoria: string;
+      por_sincronizado: boolean;
     };
   };
   relatorios: {
     key: string;
     value: Relatorio;
     indexes: {
-      'por_vistoria': string;
-      'por_sincronizado': boolean;
+      por_vistoria: string;
+      por_sincronizado: boolean;
     };
   };
   usuarios: {
     key: string;
     value: Usuario;
     indexes: {
-      'por_email': string;
+      por_email: string;
     };
   };
   sincronizacao: {
     key: string;
     value: SincronizacaoItem;
     indexes: {
-      'por_tabela': string;
-      'por_data': number;
+      por_tabela: string;
+      por_data: number;
     };
   };
 }
@@ -165,7 +165,9 @@ export const initDB = async () => {
       upgrade(db, oldVersion, newVersion, transaction) {
         // Clientes
         if (!db.objectStoreNames.contains('clientes')) {
-          const clientesStore = db.createObjectStore('clientes', { keyPath: 'id' });
+          const clientesStore = db.createObjectStore('clientes', {
+            keyPath: 'id',
+          });
           clientesStore.createIndex('por_nome', 'nome');
           clientesStore.createIndex('por_cidade', 'cidade');
           clientesStore.createIndex('por_sincronizado', 'sincronizado');
@@ -173,7 +175,9 @@ export const initDB = async () => {
 
         // Vistorias
         if (!db.objectStoreNames.contains('vistorias')) {
-          const vistoriasStore = db.createObjectStore('vistorias', { keyPath: 'id' });
+          const vistoriasStore = db.createObjectStore('vistorias', {
+            keyPath: 'id',
+          });
           vistoriasStore.createIndex('por_cliente', 'clienteId');
           vistoriasStore.createIndex('por_data', 'data');
           vistoriasStore.createIndex('por_status', 'status');
@@ -183,30 +187,36 @@ export const initDB = async () => {
 
         // Não Conformidades
         if (!db.objectStoreNames.contains('naoConformidades')) {
-          const ncStore = db.createObjectStore('naoConformidades', { keyPath: 'id' });
+          const ncStore = db.createObjectStore('naoConformidades', {
+            keyPath: 'id',
+          });
           ncStore.createIndex('por_vistoria', 'vistoriaId');
           ncStore.createIndex('por_sincronizado', 'sincronizado');
         }
 
         // Relatórios
         if (!db.objectStoreNames.contains('relatorios')) {
-          const relatoriosStore = db.createObjectStore('relatorios', { keyPath: 'id' });
+          const relatoriosStore = db.createObjectStore('relatorios', {
+            keyPath: 'id',
+          });
           relatoriosStore.createIndex('por_vistoria', 'vistoriaId');
           relatoriosStore.createIndex('por_sincronizado', 'sincronizado');
         }
 
         // Usuários
         if (!db.objectStoreNames.contains('usuarios')) {
-          const usuariosStore = db.createObjectStore('usuarios', { keyPath: 'id' });
+          const usuariosStore = db.createObjectStore('usuarios', {
+            keyPath: 'id',
+          });
           usuariosStore.createIndex('por_email', 'email');
         }
 
         // Sincronização
         // Removido sistema de sincronização
-      }
+      },
     });
   }
-  
+
   return dbPromise;
 };
 
@@ -224,5 +234,5 @@ export type {
   NaoConformidade,
   Relatorio,
   Usuario,
-  SincronizacaoItem
+  SincronizacaoItem,
 };

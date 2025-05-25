@@ -16,7 +16,9 @@ interface UseMapResult {
 }
 
 export function useMap(): UseMapResult {
-  const [currentLocation, setCurrentLocation] = useState<Coordinates | null>(null);
+  const [currentLocation, setCurrentLocation] = useState<Coordinates | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { addToast } = useToast();
@@ -31,44 +33,52 @@ export function useMap(): UseMapResult {
     setError(null);
 
     try {
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
-          timeout: 5000,
-          maximumAge: 0
-        });
-      });
+      const position = await new Promise<GeolocationPosition>(
+        (resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0,
+          });
+        }
+      );
 
       setCurrentLocation({
         latitude: position.coords.latitude,
-        longitude: position.coords.longitude
+        longitude: position.coords.longitude,
       });
     } catch (err) {
       setError('Erro ao obter localização');
       addToast({
         title: 'Erro de Localização',
         message: 'Não foi possível obter sua localização atual',
-        type: 'error'
+        type: 'error',
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  const calculateDistance = (point1: Coordinates, point2: Coordinates): number => {
+  const calculateDistance = (
+    point1: Coordinates,
+    point2: Coordinates
+  ): number => {
     const R = 6371; // Raio da Terra em km
     const dLat = toRad(point2.latitude - point1.latitude);
     const dLon = toRad(point2.longitude - point1.longitude);
     const lat1 = toRad(point1.latitude);
     const lat2 = toRad(point2.latitude);
 
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-             Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   };
 
-  const getAddressFromCoordinates = async (coords: Coordinates): Promise<string> => {
+  const getAddressFromCoordinates = async (
+    coords: Coordinates
+  ): Promise<string> => {
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.latitude}&lon=${coords.longitude}`
@@ -82,7 +92,7 @@ export function useMap(): UseMapResult {
   };
 
   const toRad = (value: number): number => {
-    return value * Math.PI / 180;
+    return (value * Math.PI) / 180;
   };
 
   return {
@@ -91,6 +101,6 @@ export function useMap(): UseMapResult {
     error,
     getUserLocation,
     calculateDistance,
-    getAddressFromCoordinates
+    getAddressFromCoordinates,
   };
 }

@@ -23,9 +23,9 @@ describe('Sync Operations', () => {
   it('should process sync queue correctly', async () => {
     const mockSync = vi.fn();
     vi.mock('./sync', () => ({
-      processSyncQueue: mockSync
+      processSyncQueue: mockSync,
     }));
-    
+
     await processSyncQueue();
     expect(mockSync).toHaveBeenCalled();
   });

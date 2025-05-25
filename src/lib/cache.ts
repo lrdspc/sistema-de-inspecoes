@@ -33,7 +33,7 @@ const API_CACHE_CONFIG = {
   maxEntries: 100,
   versionKey: 'cache_version',
   version: '1.0',
-  statsKey: 'cache_stats'
+  statsKey: 'cache_stats',
 };
 
 // Track cache statistics
@@ -45,7 +45,9 @@ interface CacheStats {
 
 function updateCacheStats(hit: boolean): void {
   try {
-    const stats = JSON.parse(localStorage.getItem(API_CACHE_CONFIG.statsKey) || '{"hits":0,"misses":0}');
+    const stats = JSON.parse(
+      localStorage.getItem(API_CACHE_CONFIG.statsKey) || '{"hits":0,"misses":0}'
+    );
     if (hit) {
       stats.hits++;
     } else {
@@ -80,12 +82,16 @@ export const cacheData = async (
     await db.delete(CACHE_STORE_NAME, oldestKey);
   }
 
-  await db.put(CACHE_STORE_NAME, {
-    data,
-    timestamp,
-    expiresAt,
-    version: API_CACHE_CONFIG.version
-  }, key);
+  await db.put(
+    CACHE_STORE_NAME,
+    {
+      data,
+      timestamp,
+      expiresAt,
+      version: API_CACHE_CONFIG.version,
+    },
+    key
+  );
 };
 
 export const getCachedData = async <T>(key: string): Promise<T | null> => {
@@ -115,7 +121,7 @@ export const clearCache = async () => {
 export const invalidateCache = async (pattern: RegExp): Promise<void> => {
   const db = await getDB();
   const keys = await db.getAllKeys(CACHE_STORE_NAME);
-  
+
   for (const key of keys) {
     if (pattern.test(key.toString())) {
       await db.delete(CACHE_STORE_NAME, key);

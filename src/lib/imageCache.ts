@@ -30,28 +30,32 @@ const getDB = async () => {
 
 export const cacheImage = async (key: string, blob: Blob) => {
   const db = await getDB();
-  
+
   // Check current cache size
   const entries = await db.getAll('image-cache');
   const currentSize = entries.reduce((acc, entry) => acc + entry.size, 0);
-  
+
   // If adding this image would exceed the limit, remove oldest entries
   if (currentSize + blob.size > MAX_CACHE_SIZE) {
     const sortedEntries = entries.sort((a, b) => a.timestamp - b.timestamp);
-    let sizeToFree = (currentSize + blob.size) - MAX_CACHE_SIZE;
-    
+    let sizeToFree = currentSize + blob.size - MAX_CACHE_SIZE;
+
     for (const entry of sortedEntries) {
       if (sizeToFree <= 0) break;
       await db.delete('image-cache', entry.key);
       sizeToFree -= entry.size;
     }
   }
-  
-  await db.put('image-cache', {
-    blob,
-    timestamp: Date.now(),
-    size: blob.size
-  }, key);
+
+  await db.put(
+    'image-cache',
+    {
+      blob,
+      timestamp: Date.now(),
+      size: blob.size,
+    },
+    key
+  );
 };
 
 export const getCachedImage = async (key: string): Promise<Blob | null> => {

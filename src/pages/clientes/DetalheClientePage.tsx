@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
-  Building, 
-  MapPin, 
-  Phone, 
-  Mail, 
-  FileText, 
-  User, 
-  Edit, 
-  ClipboardCheck, 
+import {
+  ArrowLeft,
+  Building,
+  MapPin,
+  Phone,
+  Mail,
+  FileText,
+  User,
+  Edit,
+  ClipboardCheck,
   Clock,
   Calendar,
   ExternalLink,
-  Trash2
+  Trash2,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { getDB, Cliente, Vistoria } from '../../lib/db';
@@ -34,18 +34,24 @@ export function DetalheClientePage() {
       try {
         setIsLoading(true);
         const db = await getDB();
-        
+
         // Buscar cliente
         const clienteData = await db.get('clientes', id);
         if (clienteData) {
           setCliente(clienteData);
         }
-        
+
         // Buscar vistorias relacionadas
-        const clienteVistorias = await db.getAllFromIndex('vistorias', 'por_cliente', id);
+        const clienteVistorias = await db.getAllFromIndex(
+          'vistorias',
+          'por_cliente',
+          id
+        );
         if (clienteVistorias) {
           // Ordenar por data, mais recente primeiro
-          const sortedVistorias = clienteVistorias.sort((a, b) => b.data - a.data);
+          const sortedVistorias = clienteVistorias.sort(
+            (a, b) => b.data - a.data
+          );
           setVistorias(sortedVistorias);
         }
       } catch (error) {
@@ -64,33 +70,38 @@ export function DetalheClientePage() {
     try {
       setIsLoading(true);
       const db = await getDB();
-      
+
       // Verificar se há vistorias relacionadas
       if (vistorias.length > 0) {
-        alert('Este cliente possui vistorias relacionadas e não pode ser excluído.');
+        alert(
+          'Este cliente possui vistorias relacionadas e não pode ser excluído.'
+        );
         setShowDeleteConfirm(false);
         setIsLoading(false);
         return;
       }
-      
+
       // Excluir cliente
       await db.delete('clientes', id);
-      
+
       // Adicionar à fila de sincronização
       await db.add('sincronizacao', {
-        id: Date.now().toString(36) + Math.random().toString(36).substring(2, 5),
+        id:
+          Date.now().toString(36) + Math.random().toString(36).substring(2, 5),
         tabela: 'clientes',
         operacao: 'remover',
         dados: { id },
         tentativas: 0,
         dataModificacao: Date.now(),
       });
-      
+
       // Redirecionar para a lista de clientes
       navigate('/clientes');
     } catch (error) {
       console.error('Erro ao excluir cliente:', error);
-      alert('Ocorreu um erro ao excluir o cliente. Por favor, tente novamente.');
+      alert(
+        'Ocorreu um erro ao excluir o cliente. Por favor, tente novamente.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -115,8 +126,12 @@ export function DetalheClientePage() {
   if (!cliente) {
     return (
       <div className="p-6 bg-white rounded-lg shadow-sm text-center">
-        <h2 className="text-xl font-semibold text-gray-800 mb-2">Cliente não encontrado</h2>
-        <p className="text-gray-600 mb-4">O cliente que você está procurando não existe ou foi removido.</p>
+        <h2 className="text-xl font-semibold text-gray-800 mb-2">
+          Cliente não encontrado
+        </h2>
+        <p className="text-gray-600 mb-4">
+          O cliente que você está procurando não existe ou foi removido.
+        </p>
         <Button onClick={() => navigate('/clientes')}>
           <ArrowLeft size={18} className="mr-2" />
           Voltar para a lista
@@ -133,21 +148,18 @@ export function DetalheClientePage() {
           <p className="text-gray-600">Detalhes do cliente</p>
         </div>
         <div className="mt-4 sm:mt-0 flex flex-wrap gap-2">
-          <Button 
-            variant="outline"
-            onClick={() => navigate('/clientes')}
-          >
+          <Button variant="outline" onClick={() => navigate('/clientes')}>
             <ArrowLeft size={18} className="mr-1" />
             Voltar
           </Button>
-          <Button 
+          <Button
             variant="outline"
             onClick={() => navigate(`/clientes/${id}/editar`)}
           >
             <Edit size={18} className="mr-1" />
             Editar
           </Button>
-          <Button 
+          <Button
             variant="primary"
             onClick={() => navigate(`/vistorias/nova?cliente=${id}`)}
           >
@@ -166,36 +178,50 @@ export function DetalheClientePage() {
                 <Building size={18} className="inline mb-1 mr-2" />
                 Informações Básicas
               </h2>
-              <div 
+              <div
                 className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                  cliente.sincronizado ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                  cliente.sincronizado
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-yellow-100 text-yellow-800'
                 }`}
               >
-                {cliente.sincronizado ? 'Sincronizado' : 'Pendente sincronização'}
+                {cliente.sincronizado
+                  ? 'Sincronizado'
+                  : 'Pendente sincronização'}
               </div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p className="text-sm font-medium text-gray-500">Nome / Razão Social</p>
+                <p className="text-sm font-medium text-gray-500">
+                  Nome / Razão Social
+                </p>
                 <p className="text-base text-gray-900">{cliente.nome}</p>
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500">CPF / CNPJ</p>
-                <p className="text-base text-gray-900">{formatCPFCNPJ(cliente.documento)}</p>
+                <p className="text-base text-gray-900">
+                  {formatCPFCNPJ(cliente.documento)}
+                </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Tipo de Construção</p>
-                <p className="text-base text-gray-900">{formatarTipo(cliente.tipo, cliente.tipoCustomizado)}</p>
+                <p className="text-sm font-medium text-gray-500">
+                  Tipo de Construção
+                </p>
+                <p className="text-base text-gray-900">
+                  {formatarTipo(cliente.tipo, cliente.tipoCustomizado)}
+                </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Data de Cadastro</p>
+                <p className="text-sm font-medium text-gray-500">
+                  Data de Cadastro
+                </p>
                 <p className="text-base text-gray-900">
                   {new Date(cliente.dataCriacao).toLocaleDateString('pt-BR')}
                 </p>
               </div>
             </div>
-            
+
             <div className="mt-6">
               <h3 className="text-md font-semibold text-gray-800 mb-2">
                 <MapPin size={18} className="inline mb-1 mr-2" />
@@ -203,13 +229,21 @@ export function DetalheClientePage() {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Logradouro</p>
-                  <p className="text-base text-gray-900">{cliente.logradouro}, {cliente.numero}</p>
+                  <p className="text-sm font-medium text-gray-500">
+                    Logradouro
+                  </p>
+                  <p className="text-base text-gray-900">
+                    {cliente.logradouro}, {cliente.numero}
+                  </p>
                 </div>
                 {cliente.complemento && (
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Complemento</p>
-                    <p className="text-base text-gray-900">{cliente.complemento}</p>
+                    <p className="text-sm font-medium text-gray-500">
+                      Complemento
+                    </p>
+                    <p className="text-base text-gray-900">
+                      {cliente.complemento}
+                    </p>
                   </div>
                 )}
                 <div>
@@ -218,22 +252,24 @@ export function DetalheClientePage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500">Cidade/UF</p>
-                  <p className="text-base text-gray-900">{cliente.cidade}/{cliente.estado}</p>
+                  <p className="text-base text-gray-900">
+                    {cliente.cidade}/{cliente.estado}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500">CEP</p>
                   <p className="text-base text-gray-900">
-                    {cliente.cep.replace(/(\d{5})(\d{3})/, "$1-$2")}
+                    {cliente.cep.replace(/(\d{5})(\d{3})/, '$1-$2')}
                   </p>
                 </div>
               </div>
-              
+
               <div className="mt-2">
-                <a 
+                <a
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
                     `${cliente.logradouro}, ${cliente.numero}, ${cliente.cidade}, ${cliente.estado}`
-                  )}`} 
-                  target="_blank" 
+                  )}`}
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-blue-600 hover:text-blue-800 inline-flex items-center"
                 >
@@ -242,7 +278,7 @@ export function DetalheClientePage() {
                 </a>
               </div>
             </div>
-            
+
             <div className="mt-6">
               <h3 className="text-md font-semibold text-gray-800 mb-2">
                 <Phone size={18} className="inline mb-1 mr-2" />
@@ -250,16 +286,26 @@ export function DetalheClientePage() {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Telefone Principal</p>
+                  <p className="text-sm font-medium text-gray-500">
+                    Telefone Principal
+                  </p>
                   <p className="text-base text-gray-900">
-                    {cliente.telefone.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3")}
+                    {cliente.telefone.replace(
+                      /(\d{2})(\d{5})(\d{4})/,
+                      '($1) $2-$3'
+                    )}
                   </p>
                 </div>
                 {cliente.telefoneSec && (
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Telefone Secundário</p>
+                    <p className="text-sm font-medium text-gray-500">
+                      Telefone Secundário
+                    </p>
                     <p className="text-base text-gray-900">
-                      {cliente.telefoneSec.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3")}
+                      {cliente.telefoneSec.replace(
+                        /(\d{2})(\d{5})(\d{4})/,
+                        '($1) $2-$3'
+                      )}
                     </p>
                   </div>
                 )}
@@ -271,25 +317,31 @@ export function DetalheClientePage() {
                 )}
                 {cliente.responsavel && (
                   <div>
-                    <p className="text-sm font-medium text-gray-500">Responsável</p>
-                    <p className="text-base text-gray-900">{cliente.responsavel}</p>
+                    <p className="text-sm font-medium text-gray-500">
+                      Responsável
+                    </p>
+                    <p className="text-base text-gray-900">
+                      {cliente.responsavel}
+                    </p>
                   </div>
                 )}
               </div>
             </div>
-            
+
             {cliente.observacoes && (
               <div className="mt-6">
                 <h3 className="text-md font-semibold text-gray-800 mb-2">
                   <FileText size={18} className="inline mb-1 mr-2" />
                   Observações
                 </h3>
-                <p className="text-gray-700 whitespace-pre-line">{cliente.observacoes}</p>
+                <p className="text-gray-700 whitespace-pre-line">
+                  {cliente.observacoes}
+                </p>
               </div>
             )}
-            
+
             <div className="mt-8 pt-6 border-t border-gray-200">
-              <button 
+              <button
                 onClick={() => setShowDeleteConfirm(true)}
                 className="text-red-600 hover:text-red-900 text-sm flex items-center"
               >
@@ -307,12 +359,15 @@ export function DetalheClientePage() {
               <Clock size={18} className="inline mb-1 mr-2" />
               Últimas Vistorias
             </h2>
-            
+
             {vistorias.length === 0 ? (
               <div className="text-center py-6 text-gray-500">
-                <ClipboardCheck size={32} className="mx-auto mb-2 text-gray-300" />
+                <ClipboardCheck
+                  size={32}
+                  className="mx-auto mb-2 text-gray-300"
+                />
                 <p>Nenhuma vistoria encontrada</p>
-                <Button 
+                <Button
                   onClick={() => navigate(`/vistorias/nova?cliente=${id}`)}
                   className="mt-3"
                   size="sm"
@@ -323,29 +378,39 @@ export function DetalheClientePage() {
             ) : (
               <div className="space-y-3">
                 {vistorias.slice(0, 5).map((vistoria) => (
-                  <div 
+                  <div
                     key={vistoria.id}
                     className="border border-gray-200 rounded-md p-3 hover:bg-gray-50 cursor-pointer"
                     onClick={() => navigate(`/vistorias/${vistoria.id}`)}
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="font-medium text-gray-800">{vistoria.assunto}</p>
+                        <p className="font-medium text-gray-800">
+                          {vistoria.assunto}
+                        </p>
                         <p className="text-sm text-gray-500">
                           <Calendar size={14} className="inline mr-1 mb-1" />
                           {new Date(vistoria.data).toLocaleDateString('pt-BR')}
                         </p>
                       </div>
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        vistoria.status === 'concluida' ? 'bg-green-100 text-green-800' :
-                        vistoria.status === 'agendada' ? 'bg-blue-100 text-blue-800' :
-                        vistoria.status === 'em_andamento' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {vistoria.status === 'concluida' ? 'Concluída' :
-                        vistoria.status === 'agendada' ? 'Agendada' :
-                        vistoria.status === 'em_andamento' ? 'Em andamento' :
-                        'Cancelada'}
+                      <span
+                        className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                          vistoria.status === 'concluida'
+                            ? 'bg-green-100 text-green-800'
+                            : vistoria.status === 'agendada'
+                              ? 'bg-blue-100 text-blue-800'
+                              : vistoria.status === 'em_andamento'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-red-100 text-red-800'
+                        }`}
+                      >
+                        {vistoria.status === 'concluida'
+                          ? 'Concluída'
+                          : vistoria.status === 'agendada'
+                            ? 'Agendada'
+                            : vistoria.status === 'em_andamento'
+                              ? 'Em andamento'
+                              : 'Cancelada'}
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 mt-1">
@@ -354,10 +419,10 @@ export function DetalheClientePage() {
                     </p>
                   </div>
                 ))}
-                
+
                 {vistorias.length > 5 && (
                   <div className="text-center">
-                    <button 
+                    <button
                       onClick={() => navigate(`/clientes/${id}/historico`)}
                       className="text-sm text-blue-600 hover:text-blue-800"
                     >
@@ -368,28 +433,30 @@ export function DetalheClientePage() {
               </div>
             )}
           </div>
-          
+
           <div className="bg-white p-6 rounded-lg shadow-sm">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Ações Rápidas</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Ações Rápidas
+            </h2>
             <div className="space-y-3">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full justify-start"
                 onClick={() => navigate(`/vistorias/nova?cliente=${id}`)}
               >
                 <Calendar size={18} className="mr-2" />
                 Agendar Nova Vistoria
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full justify-start"
                 onClick={() => navigate(`/clientes/${id}/historico`)}
               >
                 <Clock size={18} className="mr-2" />
                 Ver Histórico Completo
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full justify-start"
                 onClick={() => navigate(`/clientes/${id}/editar`)}
               >
@@ -405,9 +472,12 @@ export function DetalheClientePage() {
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-25 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Confirmar Exclusão</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Confirmar Exclusão
+            </h3>
             <p className="text-gray-700 mb-6">
-              Tem certeza que deseja excluir este cliente? Esta ação não pode ser desfeita.
+              Tem certeza que deseja excluir este cliente? Esta ação não pode
+              ser desfeita.
             </p>
             <div className="flex justify-end space-x-3">
               <Button

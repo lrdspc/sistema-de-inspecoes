@@ -30,7 +30,7 @@ class Analytics {
   trackEvent(event: AnalyticsEvent): void {
     this.events.push({
       ...event,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
 
     if (this.isOnline) {
@@ -53,10 +53,13 @@ class Analytics {
   getMetrics(): any {
     return {
       totalEvents: this.events.length,
-      eventsByCategory: this.events.reduce((acc, event) => {
-        acc[event.category] = (acc[event.category] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>)
+      eventsByCategory: this.events.reduce(
+        (acc, event) => {
+          acc[event.category] = (acc[event.category] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>
+      ),
     };
   }
 }

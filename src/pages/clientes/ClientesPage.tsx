@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Search, 
-  Plus, 
-  Filter, 
-  ChevronDown, 
-  Eye, 
-  Edit, 
-  ClipboardCheck, 
+import {
+  Search,
+  Plus,
+  Filter,
+  ChevronDown,
+  Eye,
+  Edit,
+  ClipboardCheck,
   Clock,
-  MapPin
+  MapPin,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -29,9 +29,9 @@ export function ClientesPage() {
   const [sortBy, setSortBy] = useState({ field: 'nome', order: 'asc' });
   const [advancedFilters, setAdvancedFilters] = useState({
     estado: '',
-    tipo: ''
+    tipo: '',
   });
-  
+
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -39,12 +39,12 @@ export function ClientesPage() {
       try {
         const db = await getDB();
         const allClientes = await db.getAll('clientes');
-        
+
         // Ordenar por nome inicialmente
-        const sortedClientes = allClientes.sort((a, b) => 
+        const sortedClientes = allClientes.sort((a, b) =>
           a.nome.localeCompare(b.nome)
         );
-        
+
         setClientes(sortedClientes);
         setFilteredClientes(sortedClientes);
         setIsLoading(false);
@@ -59,51 +59,57 @@ export function ClientesPage() {
 
   useEffect(() => {
     let result = [...clientes];
-    
+
     // Aplicar filtro de status
     if (filterStatus !== 'todos') {
       // Esta é uma simulação, em um sistema real teria mais lógica aqui
       if (filterStatus === 'ativos') {
         // Apenas um exemplo - considerando clientes com modificação recente como "ativos"
-        const threeMonthsAgo = Date.now() - (3 * 30 * 24 * 60 * 60 * 1000);
-        result = result.filter(cliente => cliente.dataModificacao > threeMonthsAgo);
+        const threeMonthsAgo = Date.now() - 3 * 30 * 24 * 60 * 60 * 1000;
+        result = result.filter(
+          (cliente) => cliente.dataModificacao > threeMonthsAgo
+        );
       } else if (filterStatus === 'inativos') {
-        const threeMonthsAgo = Date.now() - (3 * 30 * 24 * 60 * 60 * 1000);
-        result = result.filter(cliente => cliente.dataModificacao <= threeMonthsAgo);
+        const threeMonthsAgo = Date.now() - 3 * 30 * 24 * 60 * 60 * 1000;
+        result = result.filter(
+          (cliente) => cliente.dataModificacao <= threeMonthsAgo
+        );
       } else if (filterStatus === 'pendentes') {
         // Simulação - por exemplo, clientes não sincronizados
-        result = result.filter(cliente => !cliente.sincronizado);
+        result = result.filter((cliente) => !cliente.sincronizado);
       }
     }
-    
+
     // Aplicar filtros avançados
     if (advancedFilters.estado) {
-      result = result.filter(cliente => 
-        cliente.estado.toLowerCase() === advancedFilters.estado.toLowerCase()
+      result = result.filter(
+        (cliente) =>
+          cliente.estado.toLowerCase() === advancedFilters.estado.toLowerCase()
       );
     }
-    
+
     if (advancedFilters.tipo) {
-      result = result.filter(cliente => 
-        cliente.tipo === advancedFilters.tipo
+      result = result.filter(
+        (cliente) => cliente.tipo === advancedFilters.tipo
       );
     }
-    
+
     // Aplicar busca
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
-      result = result.filter(cliente => 
-        cliente.nome.toLowerCase().includes(searchLower) ||
-        cliente.documento.toLowerCase().includes(searchLower) ||
-        cliente.cidade.toLowerCase().includes(searchLower) ||
-        cliente.estado.toLowerCase().includes(searchLower)
+      result = result.filter(
+        (cliente) =>
+          cliente.nome.toLowerCase().includes(searchLower) ||
+          cliente.documento.toLowerCase().includes(searchLower) ||
+          cliente.cidade.toLowerCase().includes(searchLower) ||
+          cliente.estado.toLowerCase().includes(searchLower)
       );
     }
-    
+
     // Aplicar ordenação
     result.sort((a, b) => {
       let compareResult = 0;
-      
+
       if (sortBy.field === 'nome') {
         compareResult = a.nome.localeCompare(b.nome);
       } else if (sortBy.field === 'cidade') {
@@ -111,18 +117,18 @@ export function ClientesPage() {
       } else if (sortBy.field === 'dataCriacao') {
         compareResult = a.dataCriacao - b.dataCriacao;
       }
-      
+
       return sortBy.order === 'asc' ? compareResult : -compareResult;
     });
-    
+
     setFilteredClientes(result);
     setCurrentPage(1); // Resetar para a primeira página quando os filtros mudam
   }, [clientes, searchTerm, filterStatus, advancedFilters, sortBy]);
 
   const handleSortChange = (field: string) => {
-    setSortBy(prev => ({
+    setSortBy((prev) => ({
       field,
-      order: prev.field === field && prev.order === 'asc' ? 'desc' : 'asc'
+      order: prev.field === field && prev.order === 'asc' ? 'desc' : 'asc',
     }));
   };
 
@@ -137,7 +143,7 @@ export function ClientesPage() {
   const addDemoClientes = async () => {
     try {
       setIsLoading(true);
-      
+
       const demoClientes: Cliente[] = [
         {
           id: '1',
@@ -155,7 +161,7 @@ export function ClientesPage() {
           responsavel: 'Carlos Silva',
           dataCriacao: Date.now() - 30 * 24 * 60 * 60 * 1000, // 30 dias atrás
           dataModificacao: Date.now() - 5 * 24 * 60 * 60 * 1000, // 5 dias atrás
-          sincronizado: true
+          sincronizado: true,
         },
         {
           id: '2',
@@ -173,7 +179,7 @@ export function ClientesPage() {
           responsavel: 'Ana Mendes',
           dataCriacao: Date.now() - 60 * 24 * 60 * 60 * 1000, // 60 dias atrás
           dataModificacao: Date.now() - 10 * 24 * 60 * 60 * 1000, // 10 dias atrás
-          sincronizado: true
+          sincronizado: true,
         },
         {
           id: '3',
@@ -191,7 +197,7 @@ export function ClientesPage() {
           responsavel: 'Roberto Flores',
           dataCriacao: Date.now() - 45 * 24 * 60 * 60 * 1000, // 45 dias atrás
           dataModificacao: Date.now() - 2 * 24 * 60 * 60 * 1000, // 2 dias atrás
-          sincronizado: true
+          sincronizado: true,
         },
         {
           id: '4',
@@ -209,7 +215,7 @@ export function ClientesPage() {
           responsavel: 'Marcos Vinicius',
           dataCriacao: Date.now() - 20 * 24 * 60 * 60 * 1000, // 20 dias atrás
           dataModificacao: Date.now() - 1 * 24 * 60 * 60 * 1000, // 1 dia atrás
-          sincronizado: false
+          sincronizado: false,
         },
         {
           id: '5',
@@ -227,7 +233,7 @@ export function ClientesPage() {
           responsavel: 'José Pereira',
           dataCriacao: Date.now() - 90 * 24 * 60 * 60 * 1000, // 90 dias atrás
           dataModificacao: Date.now() - 30 * 24 * 60 * 60 * 1000, // 30 dias atrás
-          sincronizado: true
+          sincronizado: true,
         },
         {
           id: '6',
@@ -245,7 +251,7 @@ export function ClientesPage() {
           responsavel: 'Carla Santos',
           dataCriacao: Date.now() - 15 * 24 * 60 * 60 * 1000, // 15 dias atrás
           dataModificacao: Date.now() - 3 * 24 * 60 * 60 * 1000, // 3 dias atrás
-          sincronizado: true
+          sincronizado: true,
         },
         {
           id: '7',
@@ -263,7 +269,7 @@ export function ClientesPage() {
           responsavel: 'Rodrigo Maia',
           dataCriacao: Date.now() - 120 * 24 * 60 * 60 * 1000, // 120 dias atrás
           dataModificacao: Date.now() - 60 * 24 * 60 * 60 * 1000, // 60 dias atrás
-          sincronizado: true
+          sincronizado: true,
         },
         {
           id: '8',
@@ -282,17 +288,17 @@ export function ClientesPage() {
           responsavel: 'Maria Eduarda',
           dataCriacao: Date.now() - 180 * 24 * 60 * 60 * 1000, // 180 dias atrás
           dataModificacao: Date.now() - 45 * 24 * 60 * 60 * 1000, // 45 dias atrás
-          sincronizado: false
-        }
+          sincronizado: false,
+        },
       ];
-      
+
       const db = await getDB();
-      
+
       // Adicionar cada cliente ao banco de dados
       for (const cliente of demoClientes) {
         await db.put('clientes', cliente);
       }
-      
+
       // Atualizar o estado
       setClientes([...demoClientes]);
       setIsLoading(false);
@@ -311,7 +317,7 @@ export function ClientesPage() {
         </div>
         <div className="mt-4 sm:mt-0 flex">
           {clientes.length === 0 && (
-            <Button 
+            <Button
               onClick={addDemoClientes}
               variant="secondary"
               className="mr-2"
@@ -319,9 +325,7 @@ export function ClientesPage() {
               Adicionar Dados Demo
             </Button>
           )}
-          <Button 
-            onClick={() => navigate('/clientes/novo')}
-          >
+          <Button onClick={() => navigate('/clientes/novo')}>
             <Plus size={18} className="mr-1" />
             Novo Cliente
           </Button>
@@ -339,7 +343,7 @@ export function ClientesPage() {
               icon={<Search size={18} className="text-gray-400" />}
             />
           </div>
-          
+
           <div className="flex flex-wrap gap-2">
             <div className="relative">
               <Button
@@ -348,12 +352,17 @@ export function ClientesPage() {
                 className="flex items-center"
               >
                 <Filter size={16} className="mr-2" />
-                Status: {filterStatus === 'todos' ? 'Todos' : 
-                        filterStatus === 'ativos' ? 'Ativos' :
-                        filterStatus === 'inativos' ? 'Inativos' : 'Pendentes'}
+                Status:{' '}
+                {filterStatus === 'todos'
+                  ? 'Todos'
+                  : filterStatus === 'ativos'
+                    ? 'Ativos'
+                    : filterStatus === 'inativos'
+                      ? 'Inativos'
+                      : 'Pendentes'}
                 <ChevronDown size={16} className="ml-2" />
               </Button>
-              
+
               {showFilterMenu && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-200">
                   <button
@@ -395,7 +404,7 @@ export function ClientesPage() {
                 </div>
               )}
             </div>
-            
+
             <Button
               variant="outline"
               onClick={() => setShowAdvancedFilter(!showAdvancedFilter)}
@@ -407,7 +416,7 @@ export function ClientesPage() {
             </Button>
           </div>
         </div>
-        
+
         {showAdvancedFilter && (
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             <div>
@@ -417,7 +426,12 @@ export function ClientesPage() {
               <select
                 className="w-full h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
                 value={advancedFilters.estado}
-                onChange={(e) => setAdvancedFilters(prev => ({ ...prev, estado: e.target.value }))}
+                onChange={(e) =>
+                  setAdvancedFilters((prev) => ({
+                    ...prev,
+                    estado: e.target.value,
+                  }))
+                }
               >
                 <option value="">Todos</option>
                 <option value="SP">São Paulo</option>
@@ -435,7 +449,12 @@ export function ClientesPage() {
               <select
                 className="w-full h-10 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm"
                 value={advancedFilters.tipo}
-                onChange={(e) => setAdvancedFilters(prev => ({ ...prev, tipo: e.target.value }))}
+                onChange={(e) =>
+                  setAdvancedFilters((prev) => ({
+                    ...prev,
+                    tipo: e.target.value,
+                  }))
+                }
               >
                 <option value="">Todos</option>
                 <option value="residencial">Residencial</option>
@@ -456,11 +475,13 @@ export function ClientesPage() {
           </div>
         ) : filteredClientes.length === 0 ? (
           <div className="p-10 text-center">
-            <div className="text-gray-500 text-lg mb-2">Nenhum cliente encontrado</div>
+            <div className="text-gray-500 text-lg mb-2">
+              Nenhum cliente encontrado
+            </div>
             <p className="text-gray-500">
-              {clientes.length === 0 ? 
-                'Cadastre seu primeiro cliente ou adicione dados de demonstração.' : 
-                'Tente ajustar os filtros para encontrar o que está procurando.'}
+              {clientes.length === 0
+                ? 'Cadastre seu primeiro cliente ou adicione dados de demonstração.'
+                : 'Tente ajustar os filtros para encontrar o que está procurando.'}
             </p>
           </div>
         ) : (
@@ -468,16 +489,16 @@ export function ClientesPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th 
+                  <th
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                     onClick={() => handleSortChange('nome')}
                   >
                     <div className="flex items-center">
                       Nome
                       {sortBy.field === 'nome' && (
-                        <ChevronDown 
-                          size={16} 
-                          className={`ml-1 ${sortBy.order === 'desc' ? 'transform rotate-180' : ''}`} 
+                        <ChevronDown
+                          size={16}
+                          className={`ml-1 ${sortBy.order === 'desc' ? 'transform rotate-180' : ''}`}
                         />
                       )}
                     </div>
@@ -485,16 +506,16 @@ export function ClientesPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Documento
                   </th>
-                  <th 
+                  <th
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                     onClick={() => handleSortChange('cidade')}
                   >
                     <div className="flex items-center">
                       Cidade/UF
                       {sortBy.field === 'cidade' && (
-                        <ChevronDown 
-                          size={16} 
-                          className={`ml-1 ${sortBy.order === 'desc' ? 'transform rotate-180' : ''}`} 
+                        <ChevronDown
+                          size={16}
+                          className={`ml-1 ${sortBy.order === 'desc' ? 'transform rotate-180' : ''}`}
                         />
                       )}
                     </div>
@@ -514,8 +535,12 @@ export function ClientesPage() {
                 {currentItems.map((cliente) => (
                   <tr key={cliente.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-medium text-gray-900">{cliente.nome}</div>
-                      <div className="text-sm text-gray-500">{cliente.responsavel || 'Não informado'}</div>
+                      <div className="font-medium text-gray-900">
+                        {cliente.nome}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {cliente.responsavel || 'Não informado'}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {cliente.documento}
@@ -530,35 +555,45 @@ export function ClientesPage() {
                       {cliente.telefone}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={cn(
-                        "px-2 inline-flex text-xs leading-5 font-semibold rounded-full",
-                        cliente.sincronizado ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                      )}>
+                      <span
+                        className={cn(
+                          'px-2 inline-flex text-xs leading-5 font-semibold rounded-full',
+                          cliente.sincronizado
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                        )}
+                      >
                         {cliente.sincronizado ? 'Sincronizado' : 'Pendente'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <button 
+                      <button
                         className="text-indigo-600 hover:text-indigo-900 mr-3"
                         onClick={() => navigate(`/clientes/${cliente.id}`)}
                       >
                         <Eye size={18} />
                       </button>
-                      <button 
+                      <button
                         className="text-blue-600 hover:text-blue-900 mr-3"
-                        onClick={() => navigate(`/clientes/${cliente.id}/editar`)}
+                        onClick={() =>
+                          navigate(`/clientes/${cliente.id}/editar`)
+                        }
                       >
                         <Edit size={18} />
                       </button>
-                      <button 
+                      <button
                         className="text-green-600 hover:text-green-900 mr-3"
-                        onClick={() => navigate(`/vistorias/nova?cliente=${cliente.id}`)}
+                        onClick={() =>
+                          navigate(`/vistorias/nova?cliente=${cliente.id}`)
+                        }
                       >
                         <ClipboardCheck size={18} />
                       </button>
-                      <button 
+                      <button
                         className="text-gray-600 hover:text-gray-900"
-                        onClick={() => navigate(`/clientes/${cliente.id}/historico`)}
+                        onClick={() =>
+                          navigate(`/clientes/${cliente.id}/historico`)
+                        }
                       >
                         <Clock size={18} />
                       </button>
@@ -567,21 +602,25 @@ export function ClientesPage() {
                 ))}
               </tbody>
             </table>
-            
+
             {/* Paginação */}
             {totalPages > 1 && (
               <div className="px-6 py-3 flex items-center justify-between border-t border-gray-200">
                 <div className="flex-1 flex justify-between sm:hidden">
                   <Button
                     variant="outline"
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={currentPage === 1}
                   >
                     Anterior
                   </Button>
                   <Button
                     variant="outline"
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    }
                     disabled={currentPage === totalPages}
                   >
                     Próxima
@@ -590,39 +629,63 @@ export function ClientesPage() {
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm text-gray-700">
-                      Mostrando <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> a{' '}
-                      <span className="font-medium">{Math.min(currentPage * itemsPerPage, filteredClientes.length)}</span> de{' '}
-                      <span className="font-medium">{filteredClientes.length}</span> resultados
+                      Mostrando{' '}
+                      <span className="font-medium">
+                        {(currentPage - 1) * itemsPerPage + 1}
+                      </span>{' '}
+                      a{' '}
+                      <span className="font-medium">
+                        {Math.min(
+                          currentPage * itemsPerPage,
+                          filteredClientes.length
+                        )}
+                      </span>{' '}
+                      de{' '}
+                      <span className="font-medium">
+                        {filteredClientes.length}
+                      </span>{' '}
+                      resultados
                     </p>
                   </div>
                   <div>
-                    <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Paginação">
+                    <nav
+                      className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                      aria-label="Paginação"
+                    >
                       <button
-                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
                         disabled={currentPage === 1}
                         className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Anterior
                       </button>
-                      
+
                       {/* Páginas */}
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                        <button
-                          key={page}
-                          onClick={() => setCurrentPage(page)}
-                          className={cn(
-                            "relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium",
-                            currentPage === page 
-                              ? "z-10 bg-blue-50 border-blue-500 text-blue-600" 
-                              : "text-gray-500 hover:bg-gray-50"
-                          )}
-                        >
-                          {page}
-                        </button>
-                      ))}
-                      
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                        (page) => (
+                          <button
+                            key={page}
+                            onClick={() => setCurrentPage(page)}
+                            className={cn(
+                              'relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium',
+                              currentPage === page
+                                ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                                : 'text-gray-500 hover:bg-gray-50'
+                            )}
+                          >
+                            {page}
+                          </button>
+                        )
+                      )}
+
                       <button
-                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, totalPages)
+                          )
+                        }
                         disabled={currentPage === totalPages}
                         className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       >

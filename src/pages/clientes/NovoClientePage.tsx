@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { 
-  Building, 
-  User, 
-  MapPin, 
-  Mail, 
-  Phone, 
-  FileText, 
+import {
+  Building,
+  User,
+  MapPin,
+  Mail,
+  Phone,
+  FileText,
   Save,
   ArrowLeft,
-  MapPinned
+  MapPinned,
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -40,8 +40,14 @@ export function NovoClientePage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [cepLoading, setCepLoading] = useState(false);
-  
-  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<ClienteFormData>({
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+  } = useForm<ClienteFormData>({
     defaultValues: {
       nome: '',
       documento: '',
@@ -56,26 +62,27 @@ export function NovoClientePage() {
       email: '',
       responsavel: '',
       telefoneSec: '',
-      observacoes: ''
-    }
+      observacoes: '',
+    },
   });
-  
+
   const selectedTipo = watch('tipo');
-  
+
   const onSubmit = async (data: ClienteFormData) => {
     try {
       setIsLoading(true);
-      
+
       // Formatar dados
       const documentoFormatado = data.documento.replace(/\D/g, '');
-      
+
       // Preparar objeto cliente
       const novoCliente: Cliente = {
         id: generateUniqueId(),
         nome: data.nome,
         documento: documentoFormatado,
         tipo: data.tipo,
-        tipoCustomizado: data.tipo === 'outro' ? data.tipoCustomizado : undefined,
+        tipoCustomizado:
+          data.tipo === 'outro' ? data.tipoCustomizado : undefined,
         cep: data.cep.replace(/\D/g, ''),
         logradouro: data.logradouro,
         numero: data.numero,
@@ -90,13 +97,13 @@ export function NovoClientePage() {
         observacoes: data.observacoes,
         dataCriacao: Date.now(),
         dataModificacao: Date.now(),
-        sincronizado: false
+        sincronizado: false,
       };
-      
+
       // Salvar no banco de dados
       const db = await getDB();
       await db.add('clientes', novoCliente);
-      
+
       // Adicionar à fila de sincronização
       await db.add('sincronizacao', {
         id: generateUniqueId(),
@@ -106,7 +113,7 @@ export function NovoClientePage() {
         tentativas: 0,
         dataModificacao: Date.now(),
       });
-      
+
       // Redirecionar para a lista de clientes
       navigate('/clientes');
     } catch (error) {
@@ -116,29 +123,29 @@ export function NovoClientePage() {
       setIsLoading(false);
     }
   };
-  
+
   const buscarCep = async (cep: string) => {
     if (!cep || cep.length < 8) return;
-    
+
     setCepLoading(true);
     try {
       // Simular uma chamada de API (em produção, seria uma API real)
       // Esta é apenas uma simulação para demonstração
       // Em um ambiente de produção, usaria a API dos Correios ou ViaCEP
-      
+
       const cepNumerico = cep.replace(/\D/g, '');
-      
+
       if (cepNumerico === '01310100') {
         // Simular tempo de resposta da API
-        await new Promise(resolve => setTimeout(resolve, 700));
-        
+        await new Promise((resolve) => setTimeout(resolve, 700));
+
         setValue('logradouro', 'Avenida Paulista');
         setValue('bairro', 'Bela Vista');
         setValue('cidade', 'São Paulo');
         setValue('estado', 'SP');
       } else if (cepNumerico === '80250000') {
-        await new Promise(resolve => setTimeout(resolve, 700));
-        
+        await new Promise((resolve) => setTimeout(resolve, 700));
+
         setValue('logradouro', 'Rua das Flores');
         setValue('bairro', 'Centro');
         setValue('cidade', 'Curitiba');
@@ -154,17 +161,17 @@ export function NovoClientePage() {
       setCepLoading(false);
     }
   };
-  
+
   const handleCepBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const cep = e.target.value;
     buscarCep(cep);
   };
-  
+
   const handleCpfCnpjChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     e.target.value = formatCPFCNPJ(value);
   };
-  
+
   const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     e.target.value = formatCEP(value);
@@ -178,10 +185,7 @@ export function NovoClientePage() {
           <p className="text-gray-600">Cadastre um novo cliente no sistema</p>
         </div>
         <div className="mt-4 sm:mt-0">
-          <Button 
-            variant="outline"
-            onClick={() => navigate('/clientes')}
-          >
+          <Button variant="outline" onClick={() => navigate('/clientes')}>
             <ArrowLeft size={18} className="mr-1" />
             Voltar
           </Button>
@@ -192,7 +196,9 @@ export function NovoClientePage() {
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* Dados Básicos */}
           <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Dados Básicos</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Dados Básicos
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Input
@@ -206,7 +212,9 @@ export function NovoClientePage() {
               <div>
                 <Input
                   label="CPF / CNPJ *"
-                  {...register('documento', { required: 'Documento é obrigatório' })}
+                  {...register('documento', {
+                    required: 'Documento é obrigatório',
+                  })}
                   error={errors.documento?.message}
                   icon={<FileText size={18} className="text-gray-400" />}
                   placeholder="000.000.000-00 ou 00.000.000/0000-00"
@@ -231,14 +239,19 @@ export function NovoClientePage() {
                     <option value="outro">Outro</option>
                   </select>
                 </div>
-                {errors.tipo && <p className="mt-1 text-sm text-red-600">{errors.tipo.message}</p>}
+                {errors.tipo && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.tipo.message}
+                  </p>
+                )}
               </div>
               {selectedTipo === 'outro' && (
                 <div>
                   <Input
                     label="Tipo Customizado *"
-                    {...register('tipoCustomizado', { 
-                      required: selectedTipo === 'outro' ? 'Especifique o tipo' : false 
+                    {...register('tipoCustomizado', {
+                      required:
+                        selectedTipo === 'outro' ? 'Especifique o tipo' : false,
                     })}
                     error={errors.tipoCustomizado?.message}
                     placeholder="Especifique o tipo de construção"
@@ -250,7 +263,9 @@ export function NovoClientePage() {
 
           {/* Endereço */}
           <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Endereço</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Endereço
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Input
@@ -273,7 +288,9 @@ export function NovoClientePage() {
               <div className="md:col-span-2">
                 <Input
                   label="Logradouro *"
-                  {...register('logradouro', { required: 'Logradouro é obrigatório' })}
+                  {...register('logradouro', {
+                    required: 'Logradouro é obrigatório',
+                  })}
                   error={errors.logradouro?.message}
                   icon={<MapPinned size={18} className="text-gray-400" />}
                   placeholder="Rua, Avenida, etc."
@@ -351,19 +368,27 @@ export function NovoClientePage() {
                   <option value="SE">Sergipe</option>
                   <option value="TO">Tocantins</option>
                 </select>
-                {errors.estado && <p className="mt-1 text-sm text-red-600">{errors.estado.message}</p>}
+                {errors.estado && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.estado.message}
+                  </p>
+                )}
               </div>
             </div>
           </div>
 
           {/* Contato */}
           <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Informações de Contato</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Informações de Contato
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Input
                   label="Telefone Principal *"
-                  {...register('telefone', { required: 'Telefone é obrigatório' })}
+                  {...register('telefone', {
+                    required: 'Telefone é obrigatório',
+                  })}
                   error={errors.telefone?.message}
                   icon={<Phone size={18} className="text-gray-400" />}
                   placeholder="(00) 00000-0000"
@@ -399,7 +424,9 @@ export function NovoClientePage() {
 
           {/* Observações */}
           <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Informações Adicionais</h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">
+              Informações Adicionais
+            </h2>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Observações
@@ -422,10 +449,7 @@ export function NovoClientePage() {
             >
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              isLoading={isLoading}
-            >
+            <Button type="submit" isLoading={isLoading}>
               <Save size={18} className="mr-2" />
               Salvar Cliente
             </Button>

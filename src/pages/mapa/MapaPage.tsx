@@ -2,19 +2,19 @@ import React, { useState } from 'react';
 import { PageTransition } from '../../components/layout/PageTransition';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { 
-  Map as MapIcon, 
+import {
+  Map as MapIcon,
   Search,
   MapPin,
   Navigation,
   List,
-  Calendar
+  Calendar,
 } from 'lucide-react';
 
 export function MapaPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [viewType, setViewType] = useState<'mapa' | 'lista'>('mapa');
-  
+
   const mockVisitas = [
     {
       id: '1',
@@ -23,7 +23,7 @@ export function MapaPage() {
       data: new Date(),
       status: 'agendada',
       latitude: -23.5505,
-      longitude: -46.6333
+      longitude: -46.6333,
     },
     {
       id: '2',
@@ -32,16 +32,20 @@ export function MapaPage() {
       data: new Date(Date.now() + 86400000),
       status: 'agendada',
       latitude: -23.5505,
-      longitude: -46.6333
-    }
+      longitude: -46.6333,
+    },
   ];
 
   return (
     <PageTransition>
       <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Mapa de Vistorias</h1>
-          <p className="text-gray-600">Visualize e gerencie vistorias geograficamente</p>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Mapa de Vistorias
+          </h1>
+          <p className="text-gray-600">
+            Visualize e gerencie vistorias geograficamente
+          </p>
         </div>
         <div className="mt-4 sm:mt-0 flex gap-2">
           <Button
@@ -89,13 +93,17 @@ export function MapaPage() {
         {/* Conteúdo Principal */}
         <div className="grid grid-cols-1 lg:grid-cols-3 h-[calc(100vh-16rem)]">
           {/* Lista de Visitas */}
-          <div className={`border-r border-gray-200 overflow-y-auto ${viewType === 'lista' ? 'lg:col-span-3' : ''}`}>
+          <div
+            className={`border-r border-gray-200 overflow-y-auto ${viewType === 'lista' ? 'lg:col-span-3' : ''}`}
+          >
             <div className="divide-y divide-gray-200">
               {mockVisitas.map((visita) => (
                 <div key={visita.id} className="p-4 hover:bg-gray-50">
                   <div className="flex items-start justify-between">
                     <div>
-                      <h3 className="font-medium text-gray-900">{visita.cliente}</h3>
+                      <h3 className="font-medium text-gray-900">
+                        {visita.cliente}
+                      </h3>
                       <p className="text-sm text-gray-500 flex items-center mt-1">
                         <MapPin size={14} className="mr-1" />
                         {visita.endereco}
@@ -118,7 +126,8 @@ export function MapaPage() {
               <div className="text-center">
                 <MapIcon size={48} className="mx-auto text-gray-400 mb-4" />
                 <p className="text-gray-600">
-                  O mapa será implementado em breve com integração Google Maps/OpenStreetMap
+                  O mapa será implementado em breve com integração Google
+                  Maps/OpenStreetMap
                 </p>
               </div>
             </div>

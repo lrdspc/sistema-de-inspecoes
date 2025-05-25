@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { sampleSize, random } from 'lodash';
-import { 
+import {
   FileText,
   Wand2,
   Building,
   Calendar,
   MapPin,
   AlertCircle,
-  Sparkles
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -17,7 +17,12 @@ import { getDB, Cliente, Vistoria } from '../lib/db';
 import { generateUniqueId } from '../lib/utils';
 import { generateWordDoc } from '../lib/word';
 import { Packer } from 'docx';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '../components/ui/card';
 
 interface QuickFormData {
   cliente: string;
@@ -36,20 +41,25 @@ interface QuickFormData {
 export function QuickFormPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  
-  const { register, handleSubmit, formState: { errors }, setValue } = useForm<QuickFormData>({
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<QuickFormData>({
     defaultValues: {
       empreendimento: 'Residencial',
       estado: 'PR',
       modeloTelha: 'Ondulada 6mm CRFS',
-      naoConformidades: []
-    }
+      naoConformidades: [],
+    },
   });
 
   const onSubmit = async (data: QuickFormData) => {
     try {
       setIsLoading(true);
-      
+
       // Generate document using template
       const doc = await generateWordDoc({
         ...data,
@@ -59,7 +69,7 @@ export function QuickFormPage() {
         unidade: 'PR',
         coordenador: 'Marlon Weingartner',
         gerente: 'Elisabete Kudo',
-        regional: 'Sul'
+        regional: 'Sul',
       });
 
       // Convert to blob and download
@@ -72,10 +82,11 @@ export function QuickFormPage() {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      
     } catch (error) {
       console.error('Erro ao gerar relatório:', error);
-      alert('Ocorreu um erro ao gerar o relatório. Por favor, tente novamente.');
+      alert(
+        'Ocorreu um erro ao gerar o relatório. Por favor, tente novamente.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -83,38 +94,83 @@ export function QuickFormPage() {
 
   const generateRandomData = () => {
     // Random client names
-    const firstNames = ['Condomínio', 'Edifício', 'Residencial', 'Centro Comercial', 'Empresa'];
-    const lastNames = ['das Palmeiras', 'Solar', 'Vista Verde', 'Horizonte', 'Central'];
-    setValue('cliente', `${firstNames[random(0, firstNames.length - 1)]} ${lastNames[random(0, lastNames.length - 1)]}`);
-    
+    const firstNames = [
+      'Condomínio',
+      'Edifício',
+      'Residencial',
+      'Centro Comercial',
+      'Empresa',
+    ];
+    const lastNames = [
+      'das Palmeiras',
+      'Solar',
+      'Vista Verde',
+      'Horizonte',
+      'Central',
+    ];
+    setValue(
+      'cliente',
+      `${firstNames[random(0, firstNames.length - 1)]} ${lastNames[random(0, lastNames.length - 1)]}`
+    );
+
     // Random type
-    setValue('empreendimento', ['Residencial', 'Comercial', 'Industrial'][random(0, 2)]);
-    
+    setValue(
+      'empreendimento',
+      ['Residencial', 'Comercial', 'Industrial'][random(0, 2)]
+    );
+
     // Random city and state
     const cities = ['Curitiba', 'São Paulo', 'Florianópolis', 'Porto Alegre'];
     const states = ['PR', 'SP', 'SC', 'RS'];
     const cityIndex = random(0, cities.length - 1);
     setValue('cidade', cities[cityIndex]);
     setValue('estado', states[cityIndex]);
-    
+
     // Random address
-    const streets = ['Rua das Flores', 'Avenida Brasil', 'Rua XV de Novembro', 'Avenida Paulista'];
-    setValue('endereco', `${streets[random(0, streets.length - 1)]}, ${random(100, 9999)}`);
-    
+    const streets = [
+      'Rua das Flores',
+      'Avenida Brasil',
+      'Rua XV de Novembro',
+      'Avenida Paulista',
+    ];
+    setValue(
+      'endereco',
+      `${streets[random(0, streets.length - 1)]}, ${random(100, 9999)}`
+    );
+
     // Random protocol
-    setValue('protocolo', `FAR${new Date().getFullYear()}${String(random(1000, 9999)).padStart(4, '0')}`);
-    
+    setValue(
+      'protocolo',
+      `FAR${new Date().getFullYear()}${String(random(1000, 9999)).padStart(4, '0')}`
+    );
+
     // Random subject
-    const subjects = ['Infiltração no telhado', 'Vazamento', 'Inspeção de rotina', 'Avaliação técnica'];
+    const subjects = [
+      'Infiltração no telhado',
+      'Vazamento',
+      'Inspeção de rotina',
+      'Avaliação técnica',
+    ];
     setValue('assunto', subjects[random(0, subjects.length - 1)]);
-    
+
     // Random product info
-    setValue('modeloTelha', ['Ondulada 5mm CRFS', 'Ondulada 6mm CRFS', 'Ondulada 8mm CRFS', 'Estrutural'][random(0, 3)]);
+    setValue(
+      'modeloTelha',
+      [
+        'Ondulada 5mm CRFS',
+        'Ondulada 6mm CRFS',
+        'Ondulada 8mm CRFS',
+        'Estrutural',
+      ][random(0, 3)]
+    );
     setValue('quantidadeTelhas', random(50, 500));
     setValue('areaCoberta', random(100, 1000));
-    
+
     // Random non-conformities (2 to 4 random items)
-    const selectedNCs = sampleSize(Array.from({ length: 14 }, (_, i) => String(i + 1)), random(2, 4));
+    const selectedNCs = sampleSize(
+      Array.from({ length: 14 }, (_, i) => String(i + 1)),
+      random(2, 4)
+    );
     setValue('naoConformidades', selectedNCs);
   };
 
@@ -153,7 +209,7 @@ export function QuickFormPage() {
                 error={errors.cliente?.message}
                 icon={<Building size={18} className="text-gray-400" />}
               />
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Tipo de Empreendimento *
@@ -177,7 +233,7 @@ export function QuickFormPage() {
                 error={errors.cidade?.message}
                 icon={<MapPin size={18} className="text-gray-400" />}
               />
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Estado *
@@ -192,10 +248,12 @@ export function QuickFormPage() {
                   <option value="RS">Rio Grande do Sul</option>
                 </select>
               </div>
-              
+
               <Input
                 label="Endereço *"
-                {...register('endereco', { required: 'Endereço é obrigatório' })}
+                {...register('endereco', {
+                  required: 'Endereço é obrigatório',
+                })}
                 error={errors.endereco?.message}
                 icon={<MapPin size={18} className="text-gray-400" />}
               />
@@ -205,11 +263,13 @@ export function QuickFormPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
                 label="Protocolo FAR *"
-                {...register('protocolo', { required: 'Protocolo é obrigatório' })}
+                {...register('protocolo', {
+                  required: 'Protocolo é obrigatório',
+                })}
                 error={errors.protocolo?.message}
                 icon={<FileText size={18} className="text-gray-400" />}
               />
-              
+
               <Input
                 label="Assunto *"
                 {...register('assunto', { required: 'Assunto é obrigatório' })}
@@ -234,23 +294,23 @@ export function QuickFormPage() {
                   <option value="Estrutural">Estrutural</option>
                 </select>
               </div>
-              
+
               <Input
                 label="Quantidade de Telhas *"
                 type="number"
-                {...register('quantidadeTelhas', { 
+                {...register('quantidadeTelhas', {
                   required: 'Quantidade é obrigatória',
-                  min: { value: 1, message: 'Quantidade inválida' }
+                  min: { value: 1, message: 'Quantidade inválida' },
                 })}
                 error={errors.quantidadeTelhas?.message}
               />
-              
+
               <Input
                 label="Área Coberta (m²) *"
                 type="number"
-                {...register('areaCoberta', { 
+                {...register('areaCoberta', {
                   required: 'Área é obrigatória',
-                  min: { value: 1, message: 'Área inválida' }
+                  min: { value: 1, message: 'Área inválida' },
                 })}
                 error={errors.areaCoberta?.message}
               />
@@ -268,8 +328,8 @@ export function QuickFormPage() {
                     <input
                       type="checkbox"
                       value={id}
-                      {...register('naoConformidades', { 
-                        required: 'Selecione pelo menos uma não conformidade' 
+                      {...register('naoConformidades', {
+                        required: 'Selecione pelo menos uma não conformidade',
                       })}
                       className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
@@ -288,10 +348,7 @@ export function QuickFormPage() {
 
             {/* Submit */}
             <div className="flex justify-end">
-              <Button
-                type="submit"
-                isLoading={isLoading}
-              >
+              <Button type="submit" isLoading={isLoading}>
                 <FileText size={18} className="mr-2" />
                 Gerar Relatório
               </Button>

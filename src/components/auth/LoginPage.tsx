@@ -22,14 +22,18 @@ export function LoginPage() {
   const { addToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [showMFA, setShowMFA] = useState(false);
-  
-  const from = location.state?.from?.pathname || "/";
-  
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+
+  const from = location.state?.from?.pathname || '/';
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
     defaultValues: {
       email: '',
-      password: ''
-    }
+      password: '',
+    },
   });
 
   const onSubmit = async (data: LoginFormData) => {
@@ -42,12 +46,12 @@ export function LoginPage() {
         addToast({
           title: 'Verificação em duas etapas',
           message: 'Digite o código enviado para seu dispositivo',
-          type: 'info'
+          type: 'info',
         });
       } else {
         addToast({
           title: 'Login realizado com sucesso',
-          type: 'success'
+          type: 'success',
         });
         navigate(from, { replace: true });
       }
@@ -55,7 +59,7 @@ export function LoginPage() {
       addToast({
         title: 'Erro ao fazer login',
         message: error.message,
-        type: 'error'
+        type: 'error',
       });
     } finally {
       setIsLoading(false);
@@ -64,7 +68,7 @@ export function LoginPage() {
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+    visible: { opacity: 1, y: 0 },
   };
 
   return (
@@ -84,7 +88,7 @@ export function LoginPage() {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <motion.div 
+        <motion.div
           className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10"
           variants={containerVariants}
           initial="hidden"
@@ -99,28 +103,32 @@ export function LoginPage() {
               <Input
                 label="E-mail"
                 type="email"
-                {...register('email', { 
+                {...register('email', {
                   required: 'E-mail é obrigatório',
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "E-mail inválido"
-                  }
+                    message: 'E-mail inválido',
+                  },
                 })}
                 error={errors.email?.message}
                 icon={<Mail size={18} className="text-gray-400" />}
               />
             </motion.div>
 
-            <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
+            <motion.div
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
               <Input
                 label="Senha"
                 type="password"
-                {...register('password', { 
+                {...register('password', {
                   required: 'Senha é obrigatória',
                   minLength: {
                     value: 6,
-                    message: 'A senha deve ter no mínimo 6 caracteres'
-                  }
+                    message: 'A senha deve ter no mínimo 6 caracteres',
+                  },
                 })}
                 error={errors.password?.message}
                 icon={<Lock size={18} className="text-gray-400" />}
@@ -133,12 +141,18 @@ export function LoginPage() {
                     type="checkbox"
                     className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                  <label
+                    htmlFor="remember-me"
+                    className="ml-2 block text-sm text-gray-900"
+                  >
                     Lembrar-me
                   </label>
                 </div>
                 <div className="text-sm">
-                  <a href="#" className="font-medium text-blue-600 hover:text-blue-500">
+                  <a
+                    href="#"
+                    className="font-medium text-blue-600 hover:text-blue-500"
+                  >
                     Esqueceu a senha?
                   </a>
                 </div>
@@ -146,7 +160,10 @@ export function LoginPage() {
             </motion.div>
 
             {showMFA && (
-              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+              >
                 <Input
                   label="Código de Verificação"
                   {...register('mfaCode', { required: 'Código é obrigatório' })}
@@ -172,8 +189,8 @@ export function LoginPage() {
               </Button>
             </div>
           </form>
-          
-          <motion.div 
+
+          <motion.div
             className="mt-6"
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -189,15 +206,25 @@ export function LoginPage() {
                 </span>
               </div>
             </div>
-            
+
             <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
               <div className="flex items-start">
-                <AlertTriangle size={20} className="text-yellow-600 mt-0.5 mr-2" />
+                <AlertTriangle
+                  size={20}
+                  className="text-yellow-600 mt-0.5 mr-2"
+                />
                 <div>
-                  <h3 className="text-sm font-medium text-yellow-800">Credenciais de Teste</h3>
+                  <h3 className="text-sm font-medium text-yellow-800">
+                    Credenciais de Teste
+                  </h3>
                   <div className="mt-2 text-sm text-yellow-700">
-                    <p>E-mail: <code className="font-mono">tecnico@exemplo.com</code></p>
-                    <p>Senha: <code className="font-mono">123456</code></p>
+                    <p>
+                      E-mail:{' '}
+                      <code className="font-mono">tecnico@exemplo.com</code>
+                    </p>
+                    <p>
+                      Senha: <code className="font-mono">123456</code>
+                    </p>
                   </div>
                 </div>
               </div>

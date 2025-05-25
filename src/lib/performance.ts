@@ -6,7 +6,7 @@ const METRICS_THRESHOLD = {
   CLS: 0.1,
   FCP: 1800,
   TTI: 3800,
-  TTFB: 800
+  TTFB: 800,
 };
 
 export { METRICS_THRESHOLD };
@@ -52,7 +52,7 @@ export const monitorPerformance = () => {
         if (entry.entryType === 'navigation') {
           const navEntry = entry as PerformanceNavigationTiming;
           metrics.ttfb = navEntry.responseStart - navEntry.requestStart;
-          
+
           if (metrics.ttfb > METRICS_THRESHOLD.TTFB) {
             console.warn(`TTFB alto: ${metrics.ttfb}ms`);
           }
@@ -60,18 +60,18 @@ export const monitorPerformance = () => {
       }
     });
 
-    observer.observe({ 
+    observer.observe({
       entryTypes: [
         'largest-contentful-paint',
         'first-input-delay',
         'layout-shift',
         'first-contentful-paint',
         'time-to-interactive',
-        'navigation'
-      ] 
+        'navigation',
+      ],
     });
   }
-  
+
   // Report metrics periodically
   setInterval(() => {
     if (Object.keys(metrics).length > 0) {
@@ -92,12 +92,12 @@ async function reportMetrics(metrics: PerformanceMetrics): Promise<void> {
 // Otimiza renderização de listas longas
 export const optimizeListRendering = (items: any[], pageSize = 20) => {
   const [visibleItems, setVisibleItems] = useState(items.slice(0, pageSize));
-  
+
   const loadMore = useCallback(
     throttle(() => {
-      setVisibleItems(prev => [
+      setVisibleItems((prev) => [
         ...prev,
-        ...items.slice(prev.length, prev.length + pageSize)
+        ...items.slice(prev.length, prev.length + pageSize),
       ]);
     }, 300),
     [items, pageSize]
@@ -108,13 +108,16 @@ export const optimizeListRendering = (items: any[], pageSize = 20) => {
 
 // Pré-carrega imagens
 export const preloadImages = (urls: string[]) => {
-  urls.forEach(url => {
+  urls.forEach((url) => {
     const img = new Image();
     img.src = url;
   });
 };
 
 // Otimiza inputs com debounce
-export const optimizeInput = (callback: (value: string) => void, delay = 300) => {
+export const optimizeInput = (
+  callback: (value: string) => void,
+  delay = 300
+) => {
   return debounce(callback, delay);
 };

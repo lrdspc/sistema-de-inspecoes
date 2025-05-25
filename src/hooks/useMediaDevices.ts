@@ -14,7 +14,9 @@ export function useMediaDevices() {
     async function getDevices() {
       try {
         // Only request camera permission if not already granted
-        const permissions = await navigator.permissions.query({ name: 'camera' as PermissionName });
+        const permissions = await navigator.permissions.query({
+          name: 'camera' as PermissionName,
+        });
         if (permissions.state === 'prompt') {
           await navigator.mediaDevices.getUserMedia({ video: true });
         }
@@ -30,15 +32,19 @@ export function useMediaDevices() {
 
     // Listen for device changes
     const handleDeviceChange = () => {
-      navigator.mediaDevices.enumerateDevices()
-        .then(deviceList => setDevices(deviceList))
+      navigator.mediaDevices
+        .enumerateDevices()
+        .then((deviceList) => setDevices(deviceList))
         .catch(console.error);
     };
 
     navigator.mediaDevices.addEventListener('devicechange', handleDeviceChange);
 
     return () => {
-      navigator.mediaDevices.removeEventListener('devicechange', handleDeviceChange);
+      navigator.mediaDevices.removeEventListener(
+        'devicechange',
+        handleDeviceChange
+      );
     };
   }, []);
 
