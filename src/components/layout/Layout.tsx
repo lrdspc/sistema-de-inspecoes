@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { ToastContainer } from '../ui/ToastContainer';
 import { useToast } from '../../hooks/useToast';
 
-export function Layout() {
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
+export function Layout({ children }: LayoutProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { toasts, removeToast } = useToast();
 
@@ -21,7 +24,7 @@ export function Layout() {
         <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
 
         <main className="flex-1 overflow-auto p-3 md:p-4 lg:p-6">
-          <Outlet />
+          {children}
         </main>
       </div>
 
