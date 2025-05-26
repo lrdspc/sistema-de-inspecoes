@@ -106,4 +106,4 @@ export function LoginPage() {
       </div>
     </PageTransition>
   );
-} 
+}

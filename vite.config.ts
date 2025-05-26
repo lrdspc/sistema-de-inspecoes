@@ -130,10 +130,18 @@ export default defineConfig({
             if (id.includes('react') || id.includes('react-dom')) {
               return 'vendor';
             }
-            if (id.includes('lucide-react') || id.includes('framer-motion') || id.includes('react-loading-skeleton')) {
+            if (
+              id.includes('lucide-react') ||
+              id.includes('framer-motion') ||
+              id.includes('react-loading-skeleton')
+            ) {
               return 'ui';
             }
-            if (id.includes('date-fns') || id.includes('clsx') || id.includes('tailwind-merge')) {
+            if (
+              id.includes('date-fns') ||
+              id.includes('clsx') ||
+              id.includes('tailwind-merge')
+            ) {
               return 'utils';
             }
             if (id.includes('react-hook-form')) {
@@ -152,10 +160,7 @@ export default defineConfig({
     port: 3000,
     open: true,
     fs: {
-      allow: [
-        path.resolve(__dirname, './'),
-        path.resolve(__dirname, '../'),
-      ],
+      allow: [path.resolve(__dirname, './'), path.resolve(__dirname, '../')],
     },
   },
 });
