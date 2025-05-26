@@ -1,42 +1,30 @@
-import React, { useState } from 'react';
-import { Header } from './Header';
+import React from 'react';
+import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
-import { ToastContainer } from '../ui/ToastContainer';
-import { useToast } from '../../hooks/useToast';
+import { Header } from './Header';
+import { PWAUpdateNotification } from '../ui/PWAUpdateNotification';
+import { PWAInstallBanner } from '../ui/PWAInstallBanner';
+import { OfflineNotification } from '../ui/OfflineNotification';
+import { SyncStatus } from '../ui/SyncStatus';
 
-interface LayoutProps {
-  children: React.ReactNode;
-}
-
-export function Layout({ children }: LayoutProps) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { toasts, removeToast } = useToast();
-
-  const toggleSidebar = () => {
-    setIsSidebarOpen((prev) => !prev);
-  };
-
+export function Layout() {
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar isOpen={isSidebarOpen} />
-
-      <div className="flex-1 flex flex-col lg:ml-64 relative">
-        <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
-
-        <main className="flex-1 overflow-auto p-3 md:p-4 lg:p-6">
-          {children}
-        </main>
+    <div className="min-h-screen bg-gray-50">
+      <OfflineNotification />
+      <div className="flex">
+        <Sidebar />
+        <div className="flex-1">
+          <Header />
+          <main className="container mx-auto px-4 py-8">
+            <Outlet />
+          </main>
+        </div>
       </div>
-
-      {/* Overlay para fechar o sidebar em dispositivos móveis */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        ></div>
-      )}
-
-      <ToastContainer toasts={toasts} onClose={removeToast} />
+      <PWAUpdateNotification />
+      <PWAInstallBanner />
+      <div className="fixed bottom-4 left-4">
+        <SyncStatus />
+      </div>
     </div>
   );
 }

@@ -192,6 +192,31 @@ export function formatCPF(cpf: string): string {
 }
 
 /**
+ * Format a CNPJ string
+ */
+export function formatCNPJ(cnpj: string): string {
+  const cleanCNPJ = cnpj.replace(/\D/g, '');
+  return cleanCNPJ.replace(
+    /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
+    '$1.$2.$3/$4-$5'
+  );
+}
+
+/**
+ * Format a CPF or CNPJ string
+ */
+export function formatCPFCNPJ(documento: string): string {
+  const cleanDocumento = documento.replace(/\D/g, '');
+  if (cleanDocumento.length === 11) {
+    return formatCPF(cleanDocumento);
+  }
+  if (cleanDocumento.length === 14) {
+    return formatCNPJ(cleanDocumento);
+  }
+  return documento; // Retorna o original se não for CPF nem CNPJ válido em tamanho
+}
+
+/**
  * Format a phone number
  */
 export function formatPhone(phone: string): string {
@@ -596,3 +621,10 @@ export function sleep(ms: number): Promise<void> {
  * Check if the code is running on the client side
  */
 export const isClient = typeof window !== 'undefined';
+
+/**
+ * Generate a unique ID
+ */
+export function generateUniqueId(): string {
+  return uuidv4();
+}

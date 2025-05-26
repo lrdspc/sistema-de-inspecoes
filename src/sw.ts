@@ -65,16 +65,13 @@ registerRoute(
 
 // Cache de APIs
 registerRoute(
-  ({ url }) => url.pathname.startsWith('/api/'),
+  ({ url }) => url.origin === 'https://api.supabase.co',
   new NetworkFirst({
-    cacheName: CACHE_NAMES.api,
+    cacheName: 'api-cache',
     plugins: [
-      new CacheableResponsePlugin({
-        statuses: [0, 200],
-      }),
       new ExpirationPlugin({
+        maxEntries: 50,
         maxAgeSeconds: 24 * 60 * 60, // 24 horas
-        maxEntries: 100,
       }),
     ],
   })
@@ -93,25 +90,66 @@ const dbVersion = 1;
 
 // Background Sync
 self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-pending-data') {
-    event.waitUntil(syncPendingData());
+  if (event.tag === 'sync-pending-changes') {
+    event.waitUntil(syncPendingChanges());
   }
 });
 
-async function syncPendingData() {
-  const cache = await caches.open(dbCacheName);
-  const pendingRequests = await cache.keys();
+async function syncPendingChanges() {
+  try {
+    const db = await openDB('inspecoes-db', 1);
+    const pendingItems = await db.getAll('syncQueue');
 
-  for (const request of pendingRequests) {
-    try {
-      const response = await fetch(request);
-      if (response.ok) {
-        await cache.delete(request);
+    for (const item of pendingItems) {
+      try {
+        switch (item.type) {
+          case 'vistoria':
+            await syncVistoria(item);
+            break;
+          case 'relatorio':
+            await syncRelatorio(item);
+            break;
+          case 'foto':
+            await syncFoto(item);
+            break;
+          case 'assinatura':
+            await syncAssinatura(item);
+            break;
+        }
+
+        await db.delete('syncQueue', item.id);
+      } catch (error) {
+        console.error(`Erro ao sincronizar item ${item.id}:`, error);
+        await db.put('syncQueue', {
+          ...item,
+          retries: (item.retries || 0) + 1,
+          lastError: error.message,
+        });
       }
-    } catch (error) {
-      console.error('Erro ao sincronizar dados:', error);
     }
+  } catch (error) {
+    console.error('Erro durante sincronização:', error);
   }
+}
+
+async function syncVistoria(item: any) {
+  // Implementar sincronização com Supabase
+  console.log('Sincronizando vistoria:', item);
+}
+
+async function syncRelatorio(item: any) {
+  // Implementar sincronização com Supabase
+  console.log('Sincronizando relatório:', item);
+}
+
+async function syncFoto(item: any) {
+  // Implementar upload de foto para Supabase Storage
+  console.log('Sincronizando foto:', item);
+}
+
+async function syncAssinatura(item: any) {
+  // Implementar upload de assinatura para Supabase Storage
+  console.log('Sincronizando assinatura:', item);
 }
 
 // Notificações push

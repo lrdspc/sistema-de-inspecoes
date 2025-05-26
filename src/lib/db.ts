@@ -23,6 +23,9 @@ interface Cliente {
   dataCriacao: number;
   dataModificacao: number;
   sincronizado: boolean;
+  createdAt: number;
+  updatedAt: number;
+  deletedAt?: number;
 }
 
 interface Vistoria {
@@ -44,13 +47,18 @@ interface Vistoria {
   areaCoberta?: number;
   naoConformidades?: NaoConformidade[];
   observacoes?: string;
-  fotos?: string[];
-  assinaturaTecnico?: string;
-  assinaturaCliente?: string;
+  fotos: string[];
+  assinaturas: {
+    tecnico?: string;
+    cliente?: string;
+  };
   relatorioId?: string;
   dataCriacao: number;
   dataModificacao: number;
   sincronizado: boolean;
+  createdAt: number;
+  updatedAt: number;
+  deletedAt?: number;
 }
 
 interface NaoConformidade {
@@ -78,6 +86,14 @@ interface Relatorio {
   dataCriacao: number;
   dataModificacao: number;
   sincronizado: boolean;
+  createdAt: number;
+  updatedAt: number;
+  deletedAt?: number;
+  assinaturas: {
+    tecnico?: string;
+    cliente?: string;
+  };
+  anexos: string[];
 }
 
 interface Usuario {
@@ -101,6 +117,41 @@ interface SincronizacaoItem {
   tentativas: number;
   dataModificacao: number;
   erro?: string;
+}
+
+interface PhotoMetadata {
+  id: string;
+  vistoriaId: string;
+  timestamp: number;
+  description?: string;
+  localUrl: string;
+  remoteUrl?: string;
+  syncStatus: 'pending' | 'syncing' | 'synced' | 'error';
+  retries?: number;
+  error?: string;
+}
+
+interface SignatureMetadata {
+  id: string;
+  vistoriaId: string;
+  relatorioId?: string;
+  tipo: 'tecnico' | 'cliente';
+  timestamp: number;
+  localUrl: string;
+  remoteUrl?: string;
+  syncStatus: 'pending' | 'syncing' | 'synced' | 'error';
+  retries?: number;
+  error?: string;
+}
+
+interface SyncQueueItem {
+  id: string;
+  type: 'vistoria' | 'relatorio' | 'foto' | 'assinatura';
+  action: 'create' | 'update' | 'delete';
+  data: any;
+  timestamp: number;
+  retries?: number;
+  lastError?: string;
 }
 
 interface BrasilitDB extends DBSchema {
@@ -153,6 +204,33 @@ interface BrasilitDB extends DBSchema {
     indexes: {
       por_tabela: string;
       por_data: number;
+    };
+  };
+  photos: {
+    key: string;
+    value: PhotoMetadata;
+    indexes: {
+      por_vistoria: string;
+      por_timestamp: number;
+      por_status: string;
+    };
+  };
+  signatures: {
+    key: string;
+    value: SignatureMetadata;
+    indexes: {
+      por_vistoria: string;
+      por_relatorio: string;
+      por_timestamp: number;
+      por_status: string;
+    };
+  };
+  syncQueue: {
+    key: string;
+    value: SyncQueueItem;
+    indexes: {
+      por_tipo: string;
+      por_timestamp: number;
     };
   };
 }
@@ -211,6 +289,36 @@ export const initDB = async () => {
           usuariosStore.createIndex('por_email', 'email');
         }
 
+        // Fotos
+        if (!db.objectStoreNames.contains('photos')) {
+          const photosStore = db.createObjectStore('photos', {
+            keyPath: 'id',
+          });
+          photosStore.createIndex('por_vistoria', 'vistoriaId');
+          photosStore.createIndex('por_timestamp', 'timestamp');
+          photosStore.createIndex('por_status', 'syncStatus');
+        }
+
+        // Assinaturas
+        if (!db.objectStoreNames.contains('signatures')) {
+          const signaturesStore = db.createObjectStore('signatures', {
+            keyPath: 'id',
+          });
+          signaturesStore.createIndex('por_vistoria', 'vistoriaId');
+          signaturesStore.createIndex('por_relatorio', 'relatorioId');
+          signaturesStore.createIndex('por_timestamp', 'timestamp');
+          signaturesStore.createIndex('por_status', 'syncStatus');
+        }
+
+        // Fila de Sincronização
+        if (!db.objectStoreNames.contains('syncQueue')) {
+          const syncQueueStore = db.createObjectStore('syncQueue', {
+            keyPath: 'id',
+          });
+          syncQueueStore.createIndex('por_tipo', 'type');
+          syncQueueStore.createIndex('por_timestamp', 'timestamp');
+        }
+
         // Sincronização
         // Removido sistema de sincronização
       },
@@ -235,4 +343,7 @@ export type {
   Relatorio,
   Usuario,
   SincronizacaoItem,
+  SyncQueueItem,
+  PhotoMetadata,
+  SignatureMetadata,
 };
