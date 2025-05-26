@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { InstallButton } from './components/ui/InstallButton';
-import { NotificationButton } from './components/ui/NotificationButton';
-import { ShareButton } from './components/ui/ShareButton';
-import { NetworkStatus } from './components/ui/NetworkStatus';
-import { FileHandler } from './components/ui/FileHandler';
-import { BackgroundSync } from './components/ui/BackgroundSync';
 import { Layout } from './components/layout/Layout';
 import { useAuth } from './lib/auth';
+import { RequireAuth } from './components/auth/RequireAuth';
 
 // Lazy loading das páginas com named exports
+const LoginPage = React.lazy(() => import('./pages/auth/LoginPage').then(module => ({ default: module.LoginPage })));
 const DashboardPage = React.lazy(() => import('./pages/DashboardPage').then(module => ({ default: module.DashboardPage })));
 const ClientesPage = React.lazy(() => import('./pages/clientes/ClientesPage').then(module => ({ default: module.ClientesPage })));
 const NovoClientePage = React.lazy(() => import('./pages/clientes/NovoClientePage').then(module => ({ default: module.NovoClientePage })));
@@ -30,19 +26,17 @@ function App() {
     setLoading(false);
   }, []);
 
-  const handleFilesSelected = (files: File[]) => {
-    console.log('Arquivos selecionados:', files);
-  };
-
   if (loading) {
     return <div>Carregando...</div>;
   }
 
   return (
     <Router>
-      <Layout>
-        <React.Suspense fallback={<div>Carregando...</div>}>
-          <Routes>
+      <React.Suspense fallback={<div>Carregando...</div>}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          
+          <Route element={<RequireAuth><Layout /></RequireAuth>}>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/clientes" element={<ClientesPage />} />
             <Route path="/clientes/novo" element={<NovoClientePage />} />
@@ -53,41 +47,11 @@ function App() {
             <Route path="/vistorias/:id/inspecao" element={<InspecaoPage />} />
             <Route path="/agenda" element={<AgendaPage />} />
             <Route path="/relatorios" element={<RelatoriosPage />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+          </Route>
 
-          {/* Status da rede */}
-          <NetworkStatus />
-
-          {/* Botões de instalação e notificação */}
-          <InstallButton />
-          <NotificationButton />
-
-          {/* Conteúdo PWA */}
-          <div className="fixed bottom-4 left-4 space-y-4">
-            <div className="bg-white p-4 rounded-lg shadow-lg">
-              <h2 className="text-sm font-semibold text-gray-800 mb-2">
-                Compartilhar
-              </h2>
-              <ShareButton
-                title="Sistema de Inspeções"
-                text="Confira esta inspeção"
-                url={window.location.href}
-              />
-            </div>
-
-            <div className="bg-white p-4 rounded-lg shadow-lg">
-              <h2 className="text-sm font-semibold text-gray-800 mb-2">
-                Anexar Arquivos
-              </h2>
-              <FileHandler onFilesSelected={handleFilesSelected} />
-            </div>
-          </div>
-
-          {/* Sincronização em background */}
-          <BackgroundSync />
-        </React.Suspense>
-      </Layout>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </React.Suspense>
     </Router>
   );
 }

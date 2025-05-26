@@ -125,19 +125,25 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       output: {
-        sourcemap: false,
-        preserveModules: true,
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          ui: [
-            '@components/ui',
-            'lucide-react',
-            'react-loading-skeleton',
-            'framer-motion',
-          ],
-          utils: ['date-fns', 'clsx', 'tailwind-merge'],
-          form: ['react-hook-form'],
-          database: ['idb'],
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'vendor';
+            }
+            if (id.includes('lucide-react') || id.includes('framer-motion') || id.includes('react-loading-skeleton')) {
+              return 'ui';
+            }
+            if (id.includes('date-fns') || id.includes('clsx') || id.includes('tailwind-merge')) {
+              return 'utils';
+            }
+            if (id.includes('react-hook-form')) {
+              return 'form';
+            }
+            if (id.includes('idb')) {
+              return 'database';
+            }
+            return 'vendor';
+          }
         },
       },
     },
@@ -145,5 +151,11 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
+    fs: {
+      allow: [
+        path.resolve(__dirname, './'),
+        path.resolve(__dirname, '../'),
+      ],
+    },
   },
 });

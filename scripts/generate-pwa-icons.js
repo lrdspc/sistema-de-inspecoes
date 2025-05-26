@@ -32,8 +32,8 @@ async function generateIcons() {
 
     // Gera o ícone maskable
     const maskableSize = 512;
-    const padding = maskableSize * 0.1; // 10% de padding
-    const safeArea = maskableSize - padding * 2;
+    const padding = Math.floor(maskableSize * 0.1); // 10% de padding arredondado para baixo
+    const safeArea = maskableSize - (padding * 2);
 
     await sourceImage
       .clone()

@@ -3,75 +3,61 @@ import { Loader2 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'link' | 'danger';
+  variant?: 'primary' | 'secondary' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  fullWidth?: boolean;
 }
 
-export function Button({
-  children,
-  className,
-  variant = 'primary',
-  size = 'md',
-  isLoading = false,
-  disabled,
-  leftIcon,
-  rightIcon,
-  fullWidth,
-  ...props
-}: ButtonProps) {
-  return (
-    <button
-      className={cn(
-        'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
-        // Variant styles
-        {
-          'bg-blue-600 text-white hover:bg-blue-700 focus-visible:ring-blue-600':
-            variant === 'primary',
-          'bg-gray-100 text-gray-900 hover:bg-gray-200 focus-visible:ring-gray-500':
-            variant === 'secondary',
-          'border border-gray-300 bg-white hover:bg-gray-50 focus-visible:ring-gray-500':
-            variant === 'outline',
-          'hover:bg-gray-100 hover:text-gray-900 focus-visible:ring-gray-500':
-            variant === 'ghost',
-          'text-blue-600 underline-offset-4 hover:underline focus-visible:ring-blue-600':
-            variant === 'link',
-          'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-600':
-            variant === 'danger',
-        },
-        // Size styles
-        {
-          'h-8 px-3 text-sm': size === 'sm',
-          'h-10 px-4 text-sm': size === 'md',
-          'h-12 px-6 text-base': size === 'lg',
-        },
-        // Width styles
-        fullWidth && 'w-full',
-        // Loading styles
-        isLoading && 'cursor-wait',
-        className
-      )}
-      disabled={isLoading || disabled}
-      {...props}
-    >
-      {isLoading ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          <span>Carregando...</span>
-        </>
-      ) : (
-        <>
-          {leftIcon && <span className="mr-2">{leftIcon}</span>}
-          {children}
-          {rightIcon && <span className="ml-2">{rightIcon}</span>}
-        </>
-      )}
-    </button>
-  );
-}
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      className,
+      children,
+      variant = 'primary',
+      size = 'md',
+      isLoading = false,
+      disabled,
+      ...props
+    },
+    ref
+  ) => {
+    const baseStyles = 'inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
+
+    const variants = {
+      primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
+      secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500',
+      ghost: 'bg-transparent hover:bg-gray-100 focus:ring-gray-500',
+    };
+
+    const sizes = {
+      sm: 'px-3 py-1.5 text-sm rounded-md',
+      md: 'px-4 py-2 text-base rounded-lg',
+      lg: 'px-6 py-3 text-lg rounded-xl',
+    };
+
+    return (
+      <button
+        ref={ref}
+        className={cn(
+          baseStyles,
+          variants[variant],
+          sizes[size],
+          isLoading && 'relative text-transparent hover:text-transparent',
+          className
+        )}
+        disabled={disabled || isLoading}
+        {...props}
+      >
+        {children}
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Loader2 className="w-5 h-5 animate-spin text-current" />
+          </div>
+        )}
+      </button>
+    );
+  }
+);
 
 // Example usage:
 /*
